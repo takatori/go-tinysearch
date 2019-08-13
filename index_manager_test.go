@@ -2,8 +2,10 @@ package tinysearch
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
+
 
 func TestTextToWordSequence(t *testing.T) {
 
@@ -40,7 +42,7 @@ func TestUpdatePostingsList(t *testing.T) {
 
 	// when
 	for i, doc := range collection {
-		if err := im.updatePostingsList(int64(i+1), doc); err != nil {
+		if err := im.updatePostingsList(int64(i+1), strings.NewReader(doc)); err != nil {
 			t.Fatalf("failed to create index. beause: %v", err)
 		}
 	}

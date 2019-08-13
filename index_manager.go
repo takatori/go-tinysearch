@@ -1,9 +1,13 @@
 package tinysearch
 
 import (
+	"bufio"
+	"bytes"
 	_ "github.com/go-sql-driver/mysql"
+	"io"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 type IndexManager struct {
@@ -15,6 +19,7 @@ func NewIndexManager() *IndexManager {
 		index: NewIndex(),
 	}
 }
+
 
 var ignoreCharsRegxp = regexp.MustCompile("['!,?.:{}()|\\-+<>\\][/_]")
 var whitespaceRegexp = regexp.MustCompile("\\s+")
@@ -38,13 +43,35 @@ func TextToWordSequence(document string) []string {
 	return terms
 }
 
+// トークンに分割する関数
+func Analyzer(data []byte, atEOF bool) (advance int, token []byte, err error) {
+
+	advance, token, err = bufio.ScanWords(data, atEOF)
+
+	myAnalyzer := func(r rune) rune {
+		if  (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+			return -1
+		}
+		return unicode.ToLower(r)
+	}
+
+	if err == nil && token != nil {
+		token = bytes.Map(myAnalyzer, token)
+	}
+
+	return
+}
+
 // ドキュメントをインデックスに追加する処理
-func (im *IndexManager) updatePostingsList(docId int64, document string) error {
+func (im *IndexManager) updatePostingsList(docId int64, reader io.Reader) error {
 
-	// 文書をtermに分割
-	terms := TextToWordSequence(document)
+	scanner := bufio.NewScanner(reader)
+	scanner.Split(Analyzer)
 
-	for offset, term := range terms {
+	var offset int
+
+	for scanner.Scan() {
+		term := scanner.Text()
 		// termをキーとするポスティングリストが存在しない場合は新規作成
 		if postingsList, ok := im.index.dictionary[term]; !ok {
 			im.index.dictionary[term] = NewPostingsList(NewPosting(docId, []int{offset}))
@@ -52,9 +79,11 @@ func (im *IndexManager) updatePostingsList(docId int64, document string) error {
 			// ポスティングリストがすでに存在する場合は追加
 			postingsList.Add(NewPosting(docId, []int{offset}))
 		}
+		offset++
 	}
 
 	im.index.documentCount++
-	im.index.documentLength[docId] = len(terms)
+	im.index.documentLength[docId] = offset
+
 	return nil
 }

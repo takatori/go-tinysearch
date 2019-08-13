@@ -2,7 +2,6 @@ package tinysearch
 
 import (
 	"database/sql"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -51,11 +50,16 @@ func TestEngine(t *testing.T) {
 
 	// インデックス構築
 	for _, file := range files {
-		data, err := ioutil.ReadFile(file)
-		if err != nil {
-			log.Fatalf("failed read data from %s: %v", file, err)
-		}
-		engine.AddDocument(file, string(data))
+		func() {
+			fp, err := os.Open(file)
+			if err != nil {
+				t.Fatalf("failed read data from %s: %v", file, err)
+			}
+			defer fp.Close()
+			if err = engine.AddDocument(file, fp); err != nil {
+				t.Fatalf("failed to add document to index %s: %v", file, err)
+			}
+		}()
 	}
 
 	// when

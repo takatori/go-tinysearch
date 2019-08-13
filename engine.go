@@ -2,6 +2,7 @@ package tinysearch
 
 import (
 	"database/sql"
+	"io"
 )
 
 type Engine struct {
@@ -19,16 +20,15 @@ func NewSearchEngine(db *sql.DB) *Engine {
 }
 
 // 指定したパスのファイルから、インデックスを更新する
-func (e *Engine) AddDocument(title, document string) error {
+func (e *Engine) AddDocument(title string, reader io.Reader) error {
 
 	id, err := e.documentManager.saveDocument(title)
 	if err != nil {
 		return err
 	}
 
-	// todo: stringを持ち回さない
 	// todo: errorハンドリング
-	return e.indexManager.updatePostingsList(id, document)
+	return e.indexManager.updatePostingsList(id, reader)
 }
 
 // 検索を実行する
