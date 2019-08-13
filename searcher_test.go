@@ -27,9 +27,9 @@ func TestCosineScore(t *testing.T) {
 	}
 
 	idx := &Index{
-		dictionary:     dictionary,
-		documentLength: map[int64]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
-		documentCount:  5,
+		dictionary: dictionary,
+		docLength:  map[documentID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
+		docCount:   5,
 	}
 
 	query := []string{"quarrel", "sir"}
@@ -37,17 +37,7 @@ func TestCosineScore(t *testing.T) {
 	// when
 	actual := cosineScore(idx, query)
 
-	// then
-	/*
-		expected := []*result{
-			{docId: 2, score: 0.73},
-			{docId: 1, score: 0.59},
-			{docId: 5, score: 0.03},
-			{docId: 3, score: 0.01},
-		}
-	*/
-
-	expected := []int64{2, 1, 5, 3}
+	expected := []documentID{2, 1, 5, 3}
 
 	// TODO: 長さとスコアのチェック
 	for i, docId := range expected {

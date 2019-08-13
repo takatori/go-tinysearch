@@ -13,17 +13,17 @@ func NewDocumentManager(db *sql.DB) *DocumentManager {
 	return &DocumentManager{db: db}
 }
 
-func (dm *DocumentManager) saveDocument(title string) (int64, error) {
+func (dm *DocumentManager) save(title string) (documentID, error) {
 
 	result, err := dm.db.Exec(`INSERT INTO documents (document_title) VALUES (?)`, title)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return result.LastInsertId()
+	id, err := result.LastInsertId()
+	return documentID(id), err
 }
 
-func (dm *DocumentManager) fetchTitle(docId int64) (string, error) {
+func (dm *DocumentManager) fetchTitle(docId documentID) (string, error) {
 	row := dm.db.QueryRow(`SELECT document_title FROM documents WHERE document_id = ?`, docId)
 	var title string
 	err := row.Scan(&title)

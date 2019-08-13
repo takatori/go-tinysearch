@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-
 func TestTextToWordSequence(t *testing.T) {
 
 	document := "Do you quarrel, sir? Quarrel sir! no, sir! " +
@@ -42,9 +41,7 @@ func TestUpdatePostingsList(t *testing.T) {
 
 	// when
 	for i, doc := range collection {
-		if err := im.updatePostingsList(int64(i+1), strings.NewReader(doc)); err != nil {
-			t.Fatalf("failed to create index. beause: %v", err)
-		}
+		im.update(documentID(i+1), strings.NewReader(doc))
 	}
 
 	// then
@@ -68,9 +65,9 @@ func TestUpdatePostingsList(t *testing.T) {
 	}
 
 	expected := &Index{
-		dictionary:     dictionary,
-		documentLength: map[int64]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
-		documentCount:  5,
+		dictionary: dictionary,
+		docLength:  map[documentID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
+		docCount:   5,
 	}
 
 	if !reflect.DeepEqual(im.index, expected) {

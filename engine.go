@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// 検索エンジン
 type Engine struct {
 	indexManager    *IndexManager
 	documentManager *DocumentManager
@@ -19,16 +20,16 @@ func NewSearchEngine(db *sql.DB) *Engine {
 	}
 }
 
-// 指定したパスのファイルから、インデックスを更新する
+// インデックスにドキュメントを追加する
 func (e *Engine) AddDocument(title string, reader io.Reader) error {
 
-	id, err := e.documentManager.saveDocument(title)
+	id, err := e.documentManager.save(title)
 	if err != nil {
 		return err
 	}
 
-	// todo: errorハンドリング
-	return e.indexManager.updatePostingsList(id, reader)
+	e.indexManager.update(id, reader)
+	return nil
 }
 
 // 検索を実行する

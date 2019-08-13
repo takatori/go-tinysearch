@@ -7,7 +7,7 @@ import (
 
 // 検索結果を格納する構造体
 type SearchResult struct {
-	docId int64
+	docId documentID
 	score float64
 	title string
 }
@@ -15,27 +15,27 @@ type SearchResult struct {
 // String print search result info
 
 func (r *SearchResult) String() string {
-	return fmt.Sprintf("{docId: %v, score: %.2f, title: %v}", r.docId, r.score, r.title)
+	return fmt.Sprintf("{docID: %v, score: %.2f, title: %v}", r.docId, r.score, r.title)
 }
 
-type SearchResults map[int64]*SearchResult
+type SearchResults map[documentID]*SearchResult
 
 func NewSearchResults(size int) SearchResults {
 	return make(SearchResults, size)
 }
 
 // Add add and update score.
-func (results SearchResults) Add(docId int64, score float64) {
+func (results SearchResults) Add(docID documentID, score float64) {
 
-	if _, ok := results[docId]; !ok {
-		results[docId] = &SearchResult{
-			docId: docId,
+	if _, ok := results[docID]; !ok {
+		results[docID] = &SearchResult{
+			docId: docID,
 			score: score,
 		}
 	}
 
 	// すでに結果に存在する場合はスコアを更新
-	results[docId].score += score
+	results[docID].score += score
 }
 
 // 結果をソートする
