@@ -3,47 +3,38 @@ package tinysearch
 import (
 	"bufio"
 	"bytes"
-	"regexp"
 	"strings"
 	"unicode"
 )
 
-var ignoreCharsRegxp = regexp.MustCompile("['!,?.:{}()|\\-+<>\\][/_]")
-var whitespaceRegexp = regexp.MustCompile("\\s+")
+type DefaultTokenizer struct{}
 
-// ドキュメントをトークンに分割する関数
-func TextToWordSequence(document string) []string {
+// 文字列を分解する処理
+func (t *DefaultTokenizer) TextToWordSequence(text string) []string {
 
-	// 大文字を小文字に変換
-	document = strings.ToLower(document)
-
-	// 不要な文字を削除 TODO: refactoring strings.Replacer
-	document = ignoreCharsRegxp.ReplaceAllString(document, "")
-
-	// 一つ以上のスペースで分割
-	terms := whitespaceRegexp.Split(document, -1)
-
-	for i, term := range terms {
-		terms[i] = strings.Trim(term, "\n")
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	scanner.Split(t.SplitFunc)
+	var result []string
+	for scanner.Scan() {
+		result = append(result, scanner.Text())
 	}
-
-	return terms
+	return result
 }
 
-// トークンに分割する関数
-func Analyzer(data []byte, atEOF bool) (advance int, token []byte, err error) {
+// io.Readerから読んだデータをトークンに分割する関数
+func (t *DefaultTokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 	advance, token, err = bufio.ScanWords(data, atEOF)
 
-	myAnalyzer := func(r rune) rune {
-		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+	converter := func(r rune) rune {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && !unicode.IsNumber(r) {
 			return -1
 		}
 		return unicode.ToLower(r)
 	}
 
 	if err == nil && token != nil {
-		token = bytes.Map(myAnalyzer, token)
+		token = bytes.Map(converter, token)
 	}
 
 	return

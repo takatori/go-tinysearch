@@ -5,17 +5,25 @@ import (
 	"io"
 )
 
+type Tokenizer interface {
+	TextToWordSequence(string) []string
+	SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error)
+}
+
 // 検索エンジン
 type Engine struct {
-	indexManager    *IndexManager
+	tokenizer       Tokenizer
+	indexer         *Indexer
 	documentManager *DocumentManager
 }
 
 // NewSearchEngine(db) create a search engine.
 // 検索エンジンを作成する
 func NewSearchEngine(db *sql.DB) *Engine {
+	tokenizer := &DefaultTokenizer{}
 	return &Engine{
-		NewIndexManager(),
+		tokenizer,
+		NewIndexer(tokenizer),
 		NewDocumentManager(db),
 	}
 }
@@ -28,18 +36,28 @@ func (e *Engine) AddDocument(title string, reader io.Reader) error {
 		return err
 	}
 
-	e.indexManager.update(id, reader)
+	e.indexer.update(id, reader)
 	return nil
 }
 
+// TODO
+// インデックスをファイルに書き出す
+// func (e *Engine) Commit() error {
+//
+// }
+
 // 検索を実行する
-func (e *Engine) Search(query string) []*SearchResult {
-	terms := TextToWordSequence(query)
-	results := cosineScore(e.indexManager.index, terms)
+func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
+
+	terms := e.tokenizer.TextToWordSequence(query)
+	results := cosineScore(e.indexer.index, terms)
 
 	for _, result := range results {
-		title, _ := e.documentManager.fetchTitle(result.docId) // TODO: errorハンドリング
+		title, err := e.documentManager.fetchTitle(result.docId)
+		if err != nil {
+			return nil, err
+		}
 		result.title = title
 	}
-	return results
+	return results, nil
 }
