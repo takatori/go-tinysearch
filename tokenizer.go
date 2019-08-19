@@ -7,10 +7,14 @@ import (
 	"unicode"
 )
 
-type DefaultTokenizer struct{}
+type Tokenizer struct {}
+
+func NewTokenizer() *Tokenizer {
+	return &Tokenizer{}
+}
 
 // 文字列を分解する処理
-func (t *DefaultTokenizer) TextToWordSequence(text string) []string {
+func (t *Tokenizer) TextToWordSequence(text string) []string {
 
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	scanner.Split(t.SplitFunc)
@@ -22,7 +26,7 @@ func (t *DefaultTokenizer) TextToWordSequence(text string) []string {
 }
 
 // io.Readerから読んだデータをトークンに分割する関数
-func (t *DefaultTokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 	advance, token, err = bufio.ScanWords(data, atEOF)
 

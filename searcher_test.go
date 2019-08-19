@@ -27,9 +27,9 @@ func TestCosineScore(t *testing.T) {
 	}
 
 	idx := &Index{
-		dictionary: dictionary,
-		docLength:  map[documentID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
-		docCount:   5,
+		Dictionary: dictionary,
+		DocLength:  map[docID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
+		DocCount:   5,
 	}
 
 	query := []string{"quarrel", "sir"}
@@ -37,11 +37,11 @@ func TestCosineScore(t *testing.T) {
 	// when
 	actual := cosineScore(idx, query)
 
-	expected := []documentID{2, 1, 5, 3}
+	expected := []docID{2, 1, 5, 3}
 
 	// TODO: 長さとスコアのチェック
-	for i, docId := range expected {
-		if actual[i].docId != docId {
+	for i, docID := range expected {
+		if actual[i].docID != docID {
 			t.Fatalf("\ngot:\n%v\nexpected: %v\n", actual, expected)
 		}
 	}

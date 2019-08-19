@@ -17,7 +17,7 @@ func TestTextToWordSequence(t *testing.T) {
 		"i", "serve", "as", "good", "a", "man", "as",
 		"you", "no", "better", "well", "sir"}
 
-	tokenizer := &DefaultTokenizer{}
+	tokenizer := NewTokenizer()
 	actual := tokenizer.TextToWordSequence(document)
 
 	if !reflect.DeepEqual(actual, expected) {

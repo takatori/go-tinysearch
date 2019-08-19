@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-
 func TestUpdatePostingsList(t *testing.T) {
 
 	// given
@@ -19,11 +18,11 @@ func TestUpdatePostingsList(t *testing.T) {
 		"Well, sir",
 	}
 
-	im := NewIndexer(&DefaultTokenizer{})
+	im := NewIndexer(NewTokenizer())
 
 	// when
 	for i, doc := range collection {
-		im.update(documentID(i+1), strings.NewReader(doc))
+		im.update(docID(i+1), strings.NewReader(doc))
 	}
 
 	// then
@@ -47,9 +46,9 @@ func TestUpdatePostingsList(t *testing.T) {
 	}
 
 	expected := &Index{
-		dictionary: dictionary,
-		docLength:  map[documentID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
-		docCount:   5,
+		Dictionary: dictionary,
+		DocLength:  map[docID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
+		DocCount:   5,
 	}
 
 	if !reflect.DeepEqual(im.index, expected) {

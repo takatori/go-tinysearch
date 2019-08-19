@@ -7,10 +7,10 @@ import (
 
 type Indexer struct {
 	index     *Index
-	tokenizer Tokenizer
+	tokenizer *Tokenizer
 }
 
-func NewIndexer(tokenizer Tokenizer) *Indexer {
+func NewIndexer(tokenizer *Tokenizer) *Indexer {
 	return &Indexer{
 		index:     NewIndex(),
 		tokenizer: tokenizer,
@@ -18,24 +18,24 @@ func NewIndexer(tokenizer Tokenizer) *Indexer {
 }
 
 // ドキュメントをインデックスに追加する処理
-func (idxr *Indexer) update(docID documentID, reader io.Reader) {
+func (idxr *Indexer) update(docID docID, reader io.Reader) {
 
 	scanner := bufio.NewScanner(reader)
 	scanner.Split(idxr.tokenizer.SplitFunc)
-	var offset int
+	var position int
 
 	for scanner.Scan() {
 		term := scanner.Text()
-		if postingsList, ok := idxr.index.dictionary[term]; !ok {
+		if postingsList, ok := idxr.index.Dictionary[term]; !ok {
 			// termをキーとするポスティングリストが存在しない場合は新規作成
-			idxr.index.dictionary[term] = NewPostingsList(NewPosting(docID, []int{offset}))
+			idxr.index.Dictionary[term] = NewPostingsList(NewPosting(docID, []int{position}))
 		} else {
 			// ポスティングリストがすでに存在する場合は追加
-			postingsList.Add(NewPosting(docID, []int{offset}))
+			postingsList.Add(NewPosting(docID, []int{position}))
 		}
-		offset++
+		position++
 	}
 
-	idxr.index.docCount++
-	idxr.index.docLength[docID] = offset
+	idxr.index.DocCount++
+	idxr.index.DocLength[docID] = position
 }

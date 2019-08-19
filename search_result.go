@@ -7,29 +7,28 @@ import (
 
 // 検索結果を格納する構造体
 type SearchResult struct {
-	docId documentID
+	docID docID
 	score float64
 	title string
 }
 
 // String print search result info
-
 func (r *SearchResult) String() string {
-	return fmt.Sprintf("{docID: %v, score: %.2f, title: %v}", r.docId, r.score, r.title)
+	return fmt.Sprintf("{DocID: %v, score: %.2f, title: %v}", r.docID, r.score, r.title)
 }
 
-type SearchResults map[documentID]*SearchResult
+type SearchResults map[docID]*SearchResult
 
 func NewSearchResults(size int) SearchResults {
 	return make(SearchResults, size)
 }
 
 // Add add and update score.
-func (results SearchResults) Add(docID documentID, score float64) {
+func (results SearchResults) Add(docID docID, score float64) {
 
 	if _, ok := results[docID]; !ok {
 		results[docID] = &SearchResult{
-			docId: docID,
+			docID: docID,
 			score: score,
 		}
 	}
