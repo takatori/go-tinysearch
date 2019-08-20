@@ -23,6 +23,7 @@ func (ds *DocumentStore) save(title string) (docID, error) {
 	return docID(id), err
 }
 
+// [For Search]
 func (ds *DocumentStore) fetchTitle(docID docID) (string, error) {
 	row := ds.db.QueryRow(`SELECT document_title FROM documents WHERE document_id = ?`, docID)
 	var title string

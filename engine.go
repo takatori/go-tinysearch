@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -68,9 +69,31 @@ func (e *Engine) Flush() error {
 // 検索を実行する
 func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 
+	// クエリをトークンに分割
 	terms := e.tokenizer.TextToWordSequence(query)
-	results := cosineScore(e.indexer.index, terms)
 
+	// インデックスを読み込む
+	file, err := os.Open(`index.json`)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	idx := NewIndex()
+
+	if err := json.Unmarshal(bytes, idx); err != nil {
+		return nil, err
+	}
+
+	// 検索を実施
+	results := cosineScore(idx, terms)
+
+	// タイトルを取得
 	for _, result := range results {
 		title, err := e.documentStore.fetchTitle(result.docID)
 		if err != nil {

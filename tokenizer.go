@@ -13,18 +13,6 @@ func NewTokenizer() *Tokenizer {
 	return &Tokenizer{}
 }
 
-// 文字列を分解する処理
-func (t *Tokenizer) TextToWordSequence(text string) []string {
-
-	scanner := bufio.NewScanner(strings.NewReader(text))
-	scanner.Split(t.SplitFunc)
-	var result []string
-	for scanner.Scan() {
-		result = append(result, scanner.Text())
-	}
-	return result
-}
-
 // io.Readerから読んだデータをトークンに分割する関数
 func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
@@ -42,4 +30,17 @@ func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byt
 	}
 
 	return
+}
+
+// [For Search]
+// 文字列を分解する処理
+func (t *Tokenizer) TextToWordSequence(text string) []string {
+
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	scanner.Split(t.SplitFunc)
+	var result []string
+	for scanner.Scan() {
+		result = append(result, scanner.Text())
+	}
+	return result
 }

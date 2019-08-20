@@ -26,6 +26,14 @@ func NewIndex() *Index {
 	}
 }
 
+/*
+func (idx Index) UnmarshalJSON(b []byte) error {
+	i := NewIndex()
+	err := json.Unmarshal(b, i)
+	fmt.Println(i)
+	return err
+}*/
+
 func (idx Index) String() string {
 
 	keys := make([]string, 0, len(idx.Dictionary))
@@ -44,5 +52,6 @@ func (idx Index) String() string {
 		}
 	}
 
-	return fmt.Sprintf("DocLength: %v, DocCount: %v, Dictionary: %v", idx.DocLength, idx.DocCount, strings.Join(str, "\n"))
+	return fmt.Sprintf("DocLength: %v, DocCount: %v, Dictionary: %v",
+		idx.DocLength, idx.DocCount, strings.Join(str, "\n"))
 }

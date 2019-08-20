@@ -31,22 +31,6 @@ type PostingsList struct {
 	*list.List
 }
 
-type PostingListJson []*Posting
-
-func (pl PostingsList) MarshalJSON() ([]byte, error) {
-
-	postings := make([]*Posting, 0, pl.Len())
-
-	for e := pl.Front(); e != nil; e = e.Next() {
-		postings = append(postings, e.Value.(*Posting))
-	}
-	return json.Marshal(postings)
-}
-
-func (pl PostingsList) UnmarshalJSON(b []byte) error {
-	return nil // TODO: impl
-}
-
 func (pl PostingsList) add(p *Posting) {
 	pl.PushBack(p)
 }
@@ -57,6 +41,16 @@ func (pl PostingsList) last() *Posting {
 		return nil
 	}
 	return e.Value.(*Posting)
+}
+
+func (pl PostingsList) MarshalJSON() ([]byte, error) {
+
+	postings := make([]*Posting, 0, pl.Len())
+
+	for e := pl.Front(); e != nil; e = e.Next() {
+		postings = append(postings, e.Value.(*Posting))
+	}
+	return json.Marshal(postings)
 }
 
 func (pl PostingsList) String() string {
@@ -88,6 +82,21 @@ func NewPostingsList(postings ...*Posting) PostingsList {
 		l.PushBack(posting)
 	}
 	return PostingsList{l}
+}
+
+// [For Search]
+func (pl *PostingsList) UnmarshalJSON(b []byte) error {
+
+	var postings []*Posting
+	if err := json.Unmarshal(b, &postings); err != nil {
+		return err
+	}
+	pl.List = list.New()
+	for _, posting := range postings {
+		pl.add(posting)
+	}
+
+	return nil
 }
 
 type Cursor struct {
