@@ -23,7 +23,7 @@ func calcDocumentWeight(tf int) float64 {
 // 全用語で検索が必要になるため遅い
 func cosineScore(idx *Index, query []string) []*SearchResult {
 
-	results := NewSearchResults(idx.DocCount)
+	results := NewSearchResults(idx.DocsCount)
 
 	// クエリに含まれる用語ごとにスコアを計算
 	for _, term := range query {
@@ -34,7 +34,7 @@ func cosineScore(idx *Index, query []string) []*SearchResult {
 		}
 
 		// クエリベクトルの重み計算
-		wtq := calcQueryWeight(idx.DocCount, postingsList.Len())
+		wtq := calcQueryWeight(idx.DocsCount, postingsList.Len())
 
 		for cursor := postingsList.NewCursor(); cursor.Element != nil; cursor = cursor.next() {
 			posting := cursor.Posting()
@@ -46,7 +46,7 @@ func cosineScore(idx *Index, query []string) []*SearchResult {
 	}
 	// normalize
 	for _, result := range results {
-		result.score = result.score / float64(idx.DocLength[result.docID])
+		result.score = result.score / float64(idx.DocsLength[result.docID])
 	}
 
 	return results.Rank() // TODO: topk

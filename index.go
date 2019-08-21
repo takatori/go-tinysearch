@@ -11,8 +11,8 @@ import (
 // 注意:mapを使用しているのでマルチスレッドには対応していない
 type Index struct {
 	Dictionary map[string]PostingsList `json:"Dictionary"` // 辞書
-	DocCount   int                     `json:"DocCount"`   // ドキュメントの総数
-	DocLength  map[docID]int           `json:"DocLength"`  // 各ドキュメントのサイズ
+	DocsCount  int                     `json:"DocsCount"`  // ドキュメントの総数
+	DocsLength map[docID]int           `json:"DocsLength"`  // 各ドキュメントのサイズ
 }
 
 // NewIndex create a new index.
@@ -21,18 +21,10 @@ func NewIndex() *Index {
 	length := make(map[docID]int)
 	return &Index{
 		Dictionary: dict,
-		DocCount:   0,
-		DocLength:  length,
+		DocsCount:  0,
+		DocsLength: length,
 	}
 }
-
-/*
-func (idx Index) UnmarshalJSON(b []byte) error {
-	i := NewIndex()
-	err := json.Unmarshal(b, i)
-	fmt.Println(i)
-	return err
-}*/
 
 func (idx Index) String() string {
 
@@ -52,6 +44,6 @@ func (idx Index) String() string {
 		}
 	}
 
-	return fmt.Sprintf("DocLength: %v, DocCount: %v, Dictionary: %v",
-		idx.DocLength, idx.DocCount, strings.Join(str, "\n"))
+	return fmt.Sprintf("DocsLength: %v, DocsCount: %v, Dictionary: %v",
+		idx.DocsLength, idx.DocsCount, strings.Join(str, "\n"))
 }
