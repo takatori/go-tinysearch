@@ -28,10 +28,10 @@ func (idxr *Indexer) update(docID docID, reader io.Reader) {
 		term := scanner.Text()
 		if postingsList, ok := idxr.index.Dictionary[term]; !ok {
 			// termをキーとするポスティングリストが存在しない場合は新規作成
-			idxr.index.Dictionary[term] = NewPostingsList(NewPosting(docID, []int{position}))
+			idxr.index.Dictionary[term] = NewPostingsList(NewPosting(docID, position))
 		} else {
 			// ポスティングリストがすでに存在する場合は追加
-			postingsList.Add(NewPosting(docID, []int{position}))
+			postingsList.Add(NewPosting(docID, position))
 		}
 		position++
 	}

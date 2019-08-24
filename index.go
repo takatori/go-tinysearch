@@ -44,6 +44,6 @@ func (idx Index) String() string {
 		}
 	}
 
-	return fmt.Sprintf("DocsLength: %v, DocsCount: %v, Dictionary: %v",
+	return fmt.Sprintf("DocsLength: %v\nDocsCount:%v\nDictionary:\n%v\n",
 		idx.DocsLength, idx.DocsCount, strings.Join(str, "\n"))
 }

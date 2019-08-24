@@ -18,40 +18,40 @@ func TestUpdatePostingsList(t *testing.T) {
 		"Well, sir",
 	}
 
-	im := NewIndexer(NewTokenizer())
+	indexer := NewIndexer(NewTokenizer())
 
 	// when
 	for i, doc := range collection {
-		im.update(docID(i+1), strings.NewReader(doc))
+		indexer.update(docID(i), strings.NewReader(doc))
 	}
 
 	// then
 	dictionary := map[string]PostingsList{
-		"a":       NewPostingsList(NewPosting(3, []int{12})),
-		"am":      NewPostingsList(NewPosting(3, []int{5})),
-		"as":      NewPostingsList(NewPosting(3, []int{10, 14})),
-		"better":  NewPostingsList(NewPosting(4, []int{1})),
-		"do":      NewPostingsList(NewPosting(1, []int{0}), NewPosting(3, []int{2})),
-		"for":     NewPostingsList(NewPosting(3, []int{6})),
-		"good":    NewPostingsList(NewPosting(3, []int{11})),
-		"i":       NewPostingsList(NewPosting(3, []int{4, 8})),
-		"if":      NewPostingsList(NewPosting(3, []int{0})),
-		"man":     NewPostingsList(NewPosting(3, []int{13})),
-		"no":      NewPostingsList(NewPosting(2, []int{2}), NewPosting(4, []int{0})),
-		"quarrel": NewPostingsList(NewPosting(1, []int{2}), NewPosting(2, []int{0})),
-		"serve":   NewPostingsList(NewPosting(3, []int{9})),
-		"sir":     NewPostingsList(NewPosting(1, []int{3}), NewPosting(2, []int{1, 3}), NewPosting(3, []int{3}), NewPosting(5, []int{1})),
-		"well":    NewPostingsList(NewPosting(5, []int{0})),
-		"you":     NewPostingsList(NewPosting(1, []int{1}), NewPosting(3, []int{1, 7, 15})),
+		"a":       NewPostingsList(NewPosting(2, 12)),
+		"am":      NewPostingsList(NewPosting(2, 5)),
+		"as":      NewPostingsList(NewPosting(2, 10, 14)),
+		"better":  NewPostingsList(NewPosting(3, 1)),
+		"do":      NewPostingsList(NewPosting(0, 0), NewPosting(2, 2)),
+		"for":     NewPostingsList(NewPosting(2, 6)),
+		"good":    NewPostingsList(NewPosting(2, 11)),
+		"i":       NewPostingsList(NewPosting(2, 4, 8)),
+		"if":      NewPostingsList(NewPosting(2, 0)),
+		"man":     NewPostingsList(NewPosting(2, 13)),
+		"no":      NewPostingsList(NewPosting(1, 2), NewPosting(3, 0)),
+		"quarrel": NewPostingsList(NewPosting(0, 2), NewPosting(1, 0)),
+		"serve":   NewPostingsList(NewPosting(2, 9)),
+		"sir":     NewPostingsList(NewPosting(0, 3), NewPosting(1, 1, 3), NewPosting(2, 3), NewPosting(4, 1)),
+		"well":    NewPostingsList(NewPosting(4, 0)),
+		"you":     NewPostingsList(NewPosting(0, 1), NewPosting(2, 1, 7, 15)),
 	}
 
 	expected := &Index{
 		Dictionary: dictionary,
-		DocsLength: map[docID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
+		DocsLength: map[docID]int{0: 4, 1: 4, 2: 16, 3: 2, 4: 2},
 		DocsCount:  5,
 	}
 
-	if !reflect.DeepEqual(im.index, expected) {
-		t.Errorf("wrong index. \n\nexpected: \n%v\n\n got:\n%v\n", expected, im.index)
+	if !reflect.DeepEqual(indexer.index, expected) {
+		t.Errorf("wrong index. \n\nexpected: \n%v\n\n got:\n%v\n", expected, indexer.index)
 	}
 }

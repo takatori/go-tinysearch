@@ -22,7 +22,7 @@ func (p Posting) String() string {
 }
 
 // ポスティングを作成する
-func NewPosting(docID docID, positions []int) *Posting {
+func NewPosting(docID docID, positions ...int) *Posting {
 	return &Posting{docID, positions, len(positions)}
 }
 

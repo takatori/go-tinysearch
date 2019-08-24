@@ -8,27 +8,27 @@ func TestCosineScore(t *testing.T) {
 
 	// given
 	dictionary := map[string]PostingsList{
-		"a":       NewPostingsList(NewPosting(3, []int{13})),
-		"am":      NewPostingsList(NewPosting(3, []int{6})),
-		"as":      NewPostingsList(NewPosting(3, []int{11, 15})),
-		"better":  NewPostingsList(NewPosting(4, []int{2})),
-		"do":      NewPostingsList(NewPosting(1, []int{1}), NewPosting(3, []int{3})),
-		"for":     NewPostingsList(NewPosting(3, []int{7})),
-		"good":    NewPostingsList(NewPosting(3, []int{12})),
-		"i":       NewPostingsList(NewPosting(3, []int{5, 9})),
-		"if":      NewPostingsList(NewPosting(3, []int{1})),
-		"man":     NewPostingsList(NewPosting(3, []int{14})),
-		"no":      NewPostingsList(NewPosting(2, []int{3}), NewPosting(4, []int{1})),
-		"quarrel": NewPostingsList(NewPosting(1, []int{3}), NewPosting(2, []int{1})),
-		"serve":   NewPostingsList(NewPosting(3, []int{10})),
-		"sir":     NewPostingsList(NewPosting(1, []int{4}), NewPosting(2, []int{2, 4}), NewPosting(3, []int{4}), NewPosting(5, []int{2})),
-		"well":    NewPostingsList(NewPosting(5, []int{1})),
-		"you":     NewPostingsList(NewPosting(1, []int{2}), NewPosting(3, []int{2, 8, 16})),
+		"a":       NewPostingsList(NewPosting(2, 12)),
+		"am":      NewPostingsList(NewPosting(2, 5)),
+		"as":      NewPostingsList(NewPosting(2, 10, 14)),
+		"better":  NewPostingsList(NewPosting(3, 1)),
+		"do":      NewPostingsList(NewPosting(0, 0), NewPosting(2, 2)),
+		"for":     NewPostingsList(NewPosting(2, 6)),
+		"good":    NewPostingsList(NewPosting(2, 11)),
+		"i":       NewPostingsList(NewPosting(2, 4, 8)),
+		"if":      NewPostingsList(NewPosting(2, 0)),
+		"man":     NewPostingsList(NewPosting(2, 13)),
+		"no":      NewPostingsList(NewPosting(1, 2), NewPosting(3, 0)),
+		"quarrel": NewPostingsList(NewPosting(0, 2), NewPosting(1, 0)),
+		"serve":   NewPostingsList(NewPosting(2, 9)),
+		"sir":     NewPostingsList(NewPosting(0, 3), NewPosting(1, 1, 3), NewPosting(2, 3), NewPosting(4, 1)),
+		"well":    NewPostingsList(NewPosting(4, 0)),
+		"you":     NewPostingsList(NewPosting(0, 1), NewPosting(2, 1, 7, 15)),
 	}
 
 	idx := &Index{
 		Dictionary: dictionary,
-		DocsLength: map[docID]int{1: 4, 2: 4, 3: 16, 4: 2, 5: 2},
+		DocsLength: map[docID]int{0: 4, 1: 4, 2: 16, 3: 2, 4: 2},
 		DocsCount:  5,
 	}
 
@@ -37,7 +37,7 @@ func TestCosineScore(t *testing.T) {
 	// when
 	actual := cosineScore(idx, query)
 
-	expected := []docID{2, 1, 5, 3}
+	expected := []docID{1, 0, 4, 2}
 
 	// TODO: 長さとスコアのチェック
 	for i, docID := range expected {
