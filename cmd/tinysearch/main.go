@@ -15,7 +15,6 @@ func main() {
 	app.Author = "Satoshi Takatori"
 	app.Usage = `simple and small search engine for learning`
 	app.Version = "0.0.1"
-
 	app.Commands = commands.Commands
 
 	if err := app.Run(os.Args); err != nil {

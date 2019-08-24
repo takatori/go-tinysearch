@@ -36,6 +36,6 @@ func (idxr *Indexer) update(docID docID, reader io.Reader) {
 		position++
 	}
 
-	idxr.index.DocsCount++
+	idxr.index.TotalDocsCount++
 	idxr.index.DocsLength[docID] = position
 }

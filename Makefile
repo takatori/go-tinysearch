@@ -1,7 +1,3 @@
-VERSION = 0.1.0
-CURRENT_REVISION = $(shell git rev-parse --short HEAD)
-BUILD_LDFLAGS = "-s -w -X github.com/bizreach/stanby-sre.revision=$(CURRENT_REVISION)"
-
 ifdef update
   u=-u
 endif
@@ -16,13 +12,12 @@ deps:
 .PHONY: devel-deps
 devel-deps:
 	GO111MODULE=off go get ${u} \
-	  golang.org/x/lint/golint            \
-	  github.com/Songmu/goxz/cmd/goxz
+	  golang.org/x/lint/golint
 
 .PHONY: test
 test: deps
 	docker-compose up -d
-	go test -v -cover
+	go test -v -cover ./...
 
 .PHONY: lint
 lint: devel-deps
@@ -36,9 +31,3 @@ build: deps
 .PHONY: install
 install: deps
 	go install ./cmd/tinysearch
-
-.PHONY: crossbuild
-crossbuild: devel-deps
-	goxz -pv=v$(VERSION) -build-ldflags=$(BUILD_LDFLAGS) \
-	  -d=./dist/v$(VERSION) ./cmd/tinysearch
-

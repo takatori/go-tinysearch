@@ -46,9 +46,9 @@ func TestUpdatePostingsList(t *testing.T) {
 	}
 
 	expected := &Index{
-		Dictionary: dictionary,
-		DocsLength: map[docID]int{0: 4, 1: 4, 2: 16, 3: 2, 4: 2},
-		DocsCount:  5,
+		Dictionary:     dictionary,
+		DocsLength:     map[docID]int{0: 4, 1: 4, 2: 16, 3: 2, 4: 2},
+		TotalDocsCount: 5,
 	}
 
 	if !reflect.DeepEqual(indexer.index, expected) {

@@ -10,9 +10,9 @@ import (
 // 転地インデックス
 // 注意:mapを使用しているのでマルチスレッドには対応していない
 type Index struct {
-	Dictionary map[string]PostingsList `json:"Dictionary"` // 辞書
-	DocsCount  int                     `json:"DocsCount"`  // ドキュメントの総数
-	DocsLength map[docID]int           `json:"DocsLength"`  // 各ドキュメントのサイズ
+	Dictionary     map[string]PostingsList // 辞書
+	TotalDocsCount int                     // ドキュメントの総数
+	DocsLength     map[docID]int           // 各ドキュメントのサイズ
 }
 
 // NewIndex create a new index.
@@ -20,9 +20,9 @@ func NewIndex() *Index {
 	dict := make(map[string]PostingsList)
 	length := make(map[docID]int)
 	return &Index{
-		Dictionary: dict,
-		DocsCount:  0,
-		DocsLength: length,
+		Dictionary:     dict,
+		TotalDocsCount: 0,
+		DocsLength:     length,
 	}
 }
 
@@ -44,6 +44,6 @@ func (idx Index) String() string {
 		}
 	}
 
-	return fmt.Sprintf("DocsLength: %v\nDocsCount:%v\nDictionary:\n%v\n",
-		idx.DocsLength, idx.DocsCount, strings.Join(str, "\n"))
+	return fmt.Sprintf("DocsLength: %v\nTotalDocsCount:%v\nDictionary:\n%v\n",
+		idx.DocsLength, idx.TotalDocsCount, strings.Join(str, "\n"))
 }
