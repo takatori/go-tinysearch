@@ -99,18 +99,25 @@ func (pl *PostingsList) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type Cursor struct {
+type cursor struct {
 	*list.Element
 }
 
-func (pl PostingsList) NewCursor() Cursor {
-	return Cursor{pl.Front()}
+func (pl PostingsList) newCursor() cursor {
+	return cursor{pl.Front()}
 }
 
-func (c Cursor) next() Cursor {
-	return Cursor{c.Next()}
+func (c cursor) next() cursor {
+	return cursor{c.Next()}
 }
 
-func (c Cursor) Posting() *Posting {
+func (c cursor) nonNil() bool {
+	if c.Element == nil {
+		return false
+	}
+	return true
+}
+
+func (c cursor) Posting() *Posting {
 	return c.Value.(*Posting)
 }

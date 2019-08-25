@@ -35,13 +35,13 @@ func TestCosineScore(t *testing.T) {
 	query := []string{"quarrel", "sir"}
 
 	// when
-	actual := cosineScore(idx, query)
+	actual := search(idx, query, 4)
 
-	expected := []docID{1, 0, 4, 2}
+	expected := []docID{1, 0, 2, 4}
 
 	// TODO: 長さとスコアのチェック
 	for i, docID := range expected {
-		if actual[i].docID != docID {
+		if actual.scoreDocs[i].docID != docID {
 			t.Fatalf("\ngot:\n%v\nexpected: %v\n", actual, expected)
 		}
 	}

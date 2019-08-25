@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -91,15 +92,28 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 	}
 
 	// 検索を実施
-	results := cosineScore(idx, terms)
+	docs := search(idx, terms, 10)
 
+	results := make([]*SearchResult, docs.totalHits)
 	// タイトルを取得
-	for _, result := range results {
+	for i, result := range docs.scoreDocs {
 		title, err := e.documentStore.fetchTitle(result.docID)
 		if err != nil {
 			return nil, err
 		}
-		result.title = title
+		results[i] = &SearchResult{result.docID, result.score, title}
 	}
 	return results, nil
+}
+
+// 検索結果を格納する構造体
+type SearchResult struct {
+	docID docID
+	score float64
+	title string
+}
+
+// String print search result info
+func (r *SearchResult) String() string {
+	return fmt.Sprintf("{DocID: %v, score: %v, title: %v}", r.docID, r.score, r.title)
 }

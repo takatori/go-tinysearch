@@ -47,6 +47,7 @@ func TestCreateIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// TODO: 削除 <- ファイル一つで良いはず
 	// インデックスの構築を行う
 	// ファイルをひとつずつ読み込み、インデックスに追加していく
 	for _, file := range files {
@@ -83,10 +84,12 @@ func TestCreateIndex(t *testing.T) {
 		t.Fatalf("failed to create index")
 	}
 
+
+	/*
 	// [For Search]
 	// when
 	query := "Quarrel, sir."
-	actual, err := engine.Search(query, 5)
+	actual, err := engine.Search(query, 5) // TODO: 検索に使用するインデックスファイルを指定できるようにする?
 	if err != nil {
 		t.Fatalf("failed search: %v", err)
 	}
@@ -103,5 +106,5 @@ func TestCreateIndex(t *testing.T) {
 		if actual[i].docID != expectedSearchResult[i].docID {
 			t.Fatalf("\ngot:\n%v\nwant:\n%v\n", actual, expected)
 		}
-	}
+	}*/
 }
