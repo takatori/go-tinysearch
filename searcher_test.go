@@ -40,14 +40,14 @@ func TestSearch(t *testing.T) {
 
 	idx := &Index{
 		Dictionary:     dictionary,
-		DocsLength:     map[docID]int{0: 4, 1: 4, 2: 16, 3: 2, 4: 2},
 		TotalDocsCount: 5,
 	}
+	s := NewSearcher(idx)
 
 	query := []string{"quarrel", "sir"}
 
 	// when
-	actual := search(idx, query, 4)
+	actual := s.searchTopK(query, 4)
 
 	expected := []docID{1, 0}
 

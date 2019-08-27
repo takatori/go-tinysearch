@@ -12,9 +12,9 @@ type docID int64
 
 // ポスティング
 type Posting struct {
-	DocID         docID `json:"DocID"`         // ドキュメントID
-	Positions     []int `json:"Positions"`     // 用語の出現位置
-	TermFrequency int   `json:"TermFrequency"` // ドキュメント内の用語の出現回数
+	DocID         docID // ドキュメントID
+	Positions     []int // 用語の出現位置
+	TermFrequency int   // ドキュメント内の用語の出現回数
 }
 
 func (p Posting) String() string {

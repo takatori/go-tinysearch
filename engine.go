@@ -17,7 +17,7 @@ type Engine struct {
 	documentStore *DocumentStore // ドキュメントを管理する
 }
 
-// NewSearchEngine(db) create a search engine.
+// NewSearchEngine(db) create a searchTopK engine.
 // 検索エンジンを作成する処理
 func NewSearchEngine(db *sql.DB) *Engine {
 
@@ -86,16 +86,16 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 	}
 
 	idx := NewIndex()
-
 	if err := json.Unmarshal(bytes, idx); err != nil {
 		return nil, err
 	}
 
-	// 検索を実施
-	docs := search(idx, terms, 10)
+	// 検索を実行
+	searcher := NewSearcher(idx)
+	docs := searcher.searchTopK(terms, 10)
 
-	results := make([]*SearchResult, docs.totalHits)
 	// タイトルを取得
+	results := make([]*SearchResult, docs.totalHits)
 	for i, result := range docs.scoreDocs {
 		title, err := e.documentStore.fetchTitle(result.docID)
 		if err != nil {
@@ -113,7 +113,8 @@ type SearchResult struct {
 	title string
 }
 
-// String print search result info
+// String print searchTopK result info
 func (r *SearchResult) String() string {
-	return fmt.Sprintf("{DocID: %v, score: %v, title: %v}", r.docID, r.score, r.title)
+	return fmt.Sprintf("{DocID: %v, score: %v, title: %v}",
+		r.docID, r.score, r.title)
 }

@@ -78,20 +78,20 @@ func TestCreateIndex(t *testing.T) {
 
 	bytes, err := ioutil.ReadAll(file)
 
-	expected := `{"Dictionary":{"a":[{"DocID":3,"Positions":[12],"TermFrequency":1}],"am":[{"DocID":3,"Positions":[5],"TermFrequency":1}],"as":[{"DocID":3,"Positions":[10,14],"TermFrequency":2}],"better":[{"DocID":4,"Positions":[1],"TermFrequency":1}],"do":[{"DocID":1,"Positions":[0],"TermFrequency":1},{"DocID":3,"Positions":[2],"TermFrequency":1}],"for":[{"DocID":3,"Positions":[6],"TermFrequency":1}],"good":[{"DocID":3,"Positions":[11],"TermFrequency":1}],"i":[{"DocID":3,"Positions":[4,8],"TermFrequency":2}],"if":[{"DocID":3,"Positions":[0],"TermFrequency":1}],"man":[{"DocID":3,"Positions":[13],"TermFrequency":1}],"no":[{"DocID":2,"Positions":[2],"TermFrequency":1},{"DocID":4,"Positions":[0],"TermFrequency":1}],"quarrel":[{"DocID":1,"Positions":[2],"TermFrequency":1},{"DocID":2,"Positions":[0],"TermFrequency":1}],"serve":[{"DocID":3,"Positions":[9],"TermFrequency":1}],"sir":[{"DocID":1,"Positions":[3],"TermFrequency":1},{"DocID":2,"Positions":[1,3],"TermFrequency":2},{"DocID":3,"Positions":[3],"TermFrequency":1},{"DocID":5,"Positions":[1],"TermFrequency":1}],"well":[{"DocID":5,"Positions":[0],"TermFrequency":1}],"you":[{"DocID":1,"Positions":[1],"TermFrequency":1},{"DocID":3,"Positions":[1,7,15],"TermFrequency":3}]},"TotalDocsCount":5,"DocsLength":{"1":4,"2":4,"3":16,"4":2,"5":2}}`
+	expected := `{"Dictionary":{"a":[{"DocID":3,"Positions":[12],"TermFrequency":1}],"am":[{"DocID":3,"Positions":[5],"TermFrequency":1}],"as":[{"DocID":3,"Positions":[10,14],"TermFrequency":2}],"better":[{"DocID":4,"Positions":[1],"TermFrequency":1}],"do":[{"DocID":1,"Positions":[0],"TermFrequency":1},{"DocID":3,"Positions":[2],"TermFrequency":1}],"for":[{"DocID":3,"Positions":[6],"TermFrequency":1}],"good":[{"DocID":3,"Positions":[11],"TermFrequency":1}],"i":[{"DocID":3,"Positions":[4,8],"TermFrequency":2}],"if":[{"DocID":3,"Positions":[0],"TermFrequency":1}],"man":[{"DocID":3,"Positions":[13],"TermFrequency":1}],"no":[{"DocID":2,"Positions":[2],"TermFrequency":1},{"DocID":4,"Positions":[0],"TermFrequency":1}],"quarrel":[{"DocID":1,"Positions":[2],"TermFrequency":1},{"DocID":2,"Positions":[0],"TermFrequency":1}],"serve":[{"DocID":3,"Positions":[9],"TermFrequency":1}],"sir":[{"DocID":1,"Positions":[3],"TermFrequency":1},{"DocID":2,"Positions":[1,3],"TermFrequency":2},{"DocID":3,"Positions":[3],"TermFrequency":1},{"DocID":5,"Positions":[1],"TermFrequency":1}],"well":[{"DocID":5,"Positions":[0],"TermFrequency":1}],"you":[{"DocID":1,"Positions":[1],"TermFrequency":1},{"DocID":3,"Positions":[1,7,15],"TermFrequency":3}]},"TotalDocsCount":5}`
 
 	if string(bytes) != expected { // TODO: ちゃんと比較する
 		t.Fatalf("failed to create index")
 	}
+}
 
-
-	/*
+/*
 	// [For Search]
 	// when
 	query := "Quarrel, sir."
 	actual, err := engine.Search(query, 5) // TODO: 検索に使用するインデックスファイルを指定できるようにする?
 	if err != nil {
-		t.Fatalf("failed search: %v", err)
+		t.Fatalf("failed searchTopK: %v", err)
 	}
 
 	// then
@@ -107,4 +107,3 @@ func TestCreateIndex(t *testing.T) {
 			t.Fatalf("\ngot:\n%v\nwant:\n%v\n", actual, expected)
 		}
 	}*/
-}
