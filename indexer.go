@@ -18,7 +18,7 @@ func NewIndexer(tokenizer *Tokenizer) *Indexer {
 }
 
 // ドキュメントをインデックスに追加する処理
-func (idxr *Indexer) update(docID docID, reader io.Reader) {
+func (idxr *Indexer) update(docID DocumentID, reader io.Reader) {
 
 	scanner := bufio.NewScanner(reader)
 	scanner.Split(idxr.tokenizer.SplitFunc)

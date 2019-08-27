@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -34,22 +35,21 @@ func TestCreateIndex(t *testing.T) {
 	defer db.Close()
 	engine := NewSearchEngine(db) // ❶ 検索エンジンを初期化する
 
-	filepath := "testdata/romeo_and_juliet_1.txt"
-	fp, err := os.Open(filepath)
-	if err != nil {
-		t.Fatalf("failed read data from %s: %v", filepath, err)
-	}
-	defer fp.Close()
-	err = engine.AddDocument(filepath, fp) // ❷ インデックスにドキュメントを追加する
-	if err != nil {
-		t.Fatalf("failed to add document to index %s: %v", filepath, err)
-	}
+	title := "test doc"
+	body := "Do you quarrel, sir?"
 
-	err = engine.Flush() // ❸ インデックスをファイルに書き出して保存
+	// ❷ インデックスにドキュメントを追加する
+	err := engine.AddDocument("test doc", strings.NewReader(body))
+	if err != nil {
+		t.Fatalf("failed to add document to index %s: %v", title, err)
+	}
+	// ❸ インデックスをファイルに書き出して永続化
+	err = engine.Flush()
 	if err != nil {
 		t.Fatalf("failed to save index to file :%v", err)
 	}
 
+	// 以下は、検証用のコード
 	file, err := os.Open("index.json")
 	if err != nil {
 		t.Fatalf("failed to load index: %v", err)
@@ -104,7 +104,7 @@ func TestSearch(t *testing.T) {
 	}
 
 	for i := range expectedSearchResult {
-		if actual[i].docID != expectedSearchResult[i].docID {
+		if actual[i].DocumentID != expectedSearchResult[i].DocumentID {
 			t.Fatalf("\ngot:\n%v\nwant:\n%v\n", actual, expected)
 		}
 	}*/

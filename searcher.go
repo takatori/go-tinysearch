@@ -7,7 +7,7 @@ import (
 )
 
 type ScoreDoc struct {
-	docID docID
+	docID DocumentID
 	score float64
 }
 
@@ -15,14 +15,14 @@ func (d ScoreDoc) String() string {
 	return fmt.Sprintf("docId: %v, score: %v", d.docID, d.score)
 }
 
-type ScoreDocs map[docID]*ScoreDoc
+type ScoreDocs map[DocumentID]*ScoreDoc
 
 func NewScoreDocs(size int) ScoreDocs {
 	return make(ScoreDocs, size)
 }
 
 // Add add and update score.
-func (d ScoreDocs) Add(docID docID, score float64) {
+func (d ScoreDocs) Add(docID DocumentID, score float64) {
 	if _, ok := d[docID]; !ok {
 		d[docID] = &ScoreDoc{
 			docID: docID,
@@ -111,23 +111,23 @@ func (s *Searcher) search(query []string) ScoreDocs {
 		return ScoreDocs{}
 	}
 
-	c0 := s.cursors[0] // TODO: rename
+	c := s.cursors[0] // 一番短いカーソルを選択
 	cursors := s.cursors[1:]
 
 	// 結果を格納する構造体の初期化
 	docs := NewScoreDocs(s.index.TotalDocsCount)
 
-	for !c0.Empty() {
+	for !c.Empty() {
 
-		var nextDocId docID
+		var nextDocId DocumentID
 
 		for _, cursor := range cursors {
 			// docId以上になるまで読み進める
-			if cursor.NextDoc(c0.DocId()); cursor.Empty() {
+			if cursor.NextDoc(c.DocId()); cursor.Empty() {
 				return docs
 			}
 			// docIdが一致しなければ
-			if cursor.DocId() != c0.DocId() {
+			if cursor.DocId() != c.DocId() {
 				nextDocId = cursor.DocId()
 				break
 			}
@@ -135,13 +135,13 @@ func (s *Searcher) search(query []string) ScoreDocs {
 
 		if nextDocId > 0 {
 			// nextDocId以上になるまで読みすすめる
-			if c0.NextDoc(nextDocId); c0.Empty() {
+			if c.NextDoc(nextDocId); c.Empty() {
 				return docs
 			}
 		} else {
 			// 結果を格納
-			docs.Add(c0.DocId(), s.calcScore())
-			c0.Next()
+			docs.Add(c.DocId(), s.calcScore())
+			c.Next()
 		}
 	}
 

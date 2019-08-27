@@ -8,13 +8,13 @@ import (
 )
 
 // ドキュメントID
-type docID int64
+type DocumentID int64
 
 // ポスティング
 type Posting struct {
-	DocID         docID // ドキュメントID
-	Positions     []int // 用語の出現位置
-	TermFrequency int   // ドキュメント内の用語の出現回数
+	DocID         DocumentID // ドキュメントID
+	Positions     []int      // 用語の出現位置
+	TermFrequency int        // ドキュメント内の用語の出現回数
 }
 
 func (p Posting) String() string {
@@ -22,7 +22,7 @@ func (p Posting) String() string {
 }
 
 // ポスティングを作成する
-func NewPosting(docID docID, positions ...int) *Posting {
+func NewPosting(docID DocumentID, positions ...int) *Posting {
 	return &Posting{docID, positions, len(positions)}
 }
 
@@ -112,7 +112,7 @@ func (c *Cursor) Next() {
 	c.current = c.current.Next()
 }
 
-func (c *Cursor) NextDoc(id docID) {
+func (c *Cursor) NextDoc(id DocumentID) {
 	for !c.Empty() && c.DocId() < id {
 		c.Next()
 	}
@@ -129,7 +129,7 @@ func (c *Cursor) Posting() *Posting {
 	return c.current.Value.(*Posting)
 }
 
-func (c *Cursor) DocId() docID {
+func (c *Cursor) DocId() DocumentID {
 	return c.current.Value.(*Posting).DocID
 }
 

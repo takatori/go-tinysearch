@@ -22,35 +22,43 @@ func TestUpdatePostingsList(t *testing.T) {
 
 	// when
 	for i, doc := range collection {
-		indexer.update(docID(i), strings.NewReader(doc))
+		indexer.update(DocumentID(i), strings.NewReader(doc))
 	}
+	actual := indexer.index
 
 	// then
-	dictionary := map[string]PostingsList{
-		"a":       NewPostingsList(NewPosting(2, 12)),
-		"am":      NewPostingsList(NewPosting(2, 5)),
-		"as":      NewPostingsList(NewPosting(2, 10, 14)),
-		"better":  NewPostingsList(NewPosting(3, 1)),
-		"do":      NewPostingsList(NewPosting(0, 0), NewPosting(2, 2)),
-		"for":     NewPostingsList(NewPosting(2, 6)),
-		"good":    NewPostingsList(NewPosting(2, 11)),
-		"i":       NewPostingsList(NewPosting(2, 4, 8)),
-		"if":      NewPostingsList(NewPosting(2, 0)),
-		"man":     NewPostingsList(NewPosting(2, 13)),
-		"no":      NewPostingsList(NewPosting(1, 2), NewPosting(3, 0)),
-		"quarrel": NewPostingsList(NewPosting(0, 2), NewPosting(1, 0)),
-		"serve":   NewPostingsList(NewPosting(2, 9)),
-		"sir":     NewPostingsList(NewPosting(0, 3), NewPosting(1, 1, 3), NewPosting(2, 3), NewPosting(4, 1)),
-		"well":    NewPostingsList(NewPosting(4, 0)),
-		"you":     NewPostingsList(NewPosting(0, 1), NewPosting(2, 1, 7, 15)),
-	}
-
+	// TODO: 削る
 	expected := &Index{
-		Dictionary:     dictionary,
+		Dictionary: map[string]PostingsList{
+			"a":      NewPostingsList(NewPosting(2, 12)),
+			"am":     NewPostingsList(NewPosting(2, 5)),
+			"as":     NewPostingsList(NewPosting(2, 10, 14)),
+			"better": NewPostingsList(NewPosting(3, 1)),
+			"do": NewPostingsList(
+				NewPosting(0, 0),
+				NewPosting(2, 2)),
+			"for":  NewPostingsList(NewPosting(2, 6)),
+			"good": NewPostingsList(NewPosting(2, 11)),
+			"i":    NewPostingsList(NewPosting(2, 4, 8)),
+			"if":   NewPostingsList(NewPosting(2, 0)),
+			"man":  NewPostingsList(NewPosting(2, 13)),
+			"no": NewPostingsList(NewPosting(1, 2),
+				NewPosting(3, 0)),
+			"quarrel": NewPostingsList(NewPosting(0, 2),
+				NewPosting(1, 0)),
+			"serve": NewPostingsList(NewPosting(2, 9)),
+			"sir": NewPostingsList(NewPosting(0, 3),
+				NewPosting(1, 1, 3),
+				NewPosting(2, 3),
+				NewPosting(4, 1)),
+			"well": NewPostingsList(NewPosting(4, 0)),
+			"you": NewPostingsList(NewPosting(0, 1),
+				NewPosting(2, 1, 7, 15)),
+		},
 		TotalDocsCount: 5,
 	}
 
-	if !reflect.DeepEqual(indexer.index, expected) {
-		t.Errorf("wrong index. \n\nexpected: \n%v\n\n got:\n%v\n", expected, indexer.index)
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("wrong index. \n\nwant: \n%v\n\n got:\n%v\n", expected, actual)
 	}
 }

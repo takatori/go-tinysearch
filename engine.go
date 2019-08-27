@@ -108,7 +108,7 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 
 // 検索結果を格納する構造体
 type SearchResult struct {
-	docID docID
+	docID DocumentID
 	score float64
 	title string
 }
