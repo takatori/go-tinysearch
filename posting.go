@@ -99,25 +99,40 @@ func (pl *PostingsList) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type cursor struct {
-	*list.Element
+// 現在の読み込み位置を表すポインタ
+type Cursor struct {
+	current *list.Element
 }
 
-func (pl PostingsList) newCursor() cursor {
-	return cursor{pl.Front()}
+func (pl PostingsList) openCursor() *Cursor {
+	return &Cursor{pl.Front()}
 }
 
-func (c cursor) next() cursor {
-	return cursor{c.Next()}
+func (c *Cursor) Next() {
+	c.current = c.current.Next()
 }
 
-func (c cursor) nonNil() bool {
-	if c.Element == nil {
-		return false
+func (c *Cursor) NextDoc(id docID) {
+	for !c.Empty() && c.DocId() < id {
+		c.Next()
 	}
-	return true
 }
 
-func (c cursor) Posting() *Posting {
-	return c.Value.(*Posting)
+func (c *Cursor) Empty() bool {
+	if c.current == nil {
+		return true
+	}
+	return false
+}
+
+func (c *Cursor) Posting() *Posting {
+	return c.current.Value.(*Posting)
+}
+
+func (c *Cursor) DocId() docID {
+	return c.current.Value.(*Posting).DocID
+}
+
+func (c *Cursor) String() string {
+	return fmt.Sprint(c.Posting())
 }
