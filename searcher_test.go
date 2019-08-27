@@ -1,60 +1,59 @@
 package tinysearch
 
 import (
+	"encoding/json"
+	"reflect"
 	"testing"
 )
 
-func TestSearch(t *testing.T) {
+func TestSearchTopK(t *testing.T) {
 
-	// given
-	dictionary := map[string]PostingsList{
-		"a":      NewPostingsList(NewPosting(2, 12)),
-		"am":     NewPostingsList(NewPosting(2, 5)),
-		"as":     NewPostingsList(NewPosting(2, 10, 14)),
-		"better": NewPostingsList(NewPosting(3, 1)),
-		"do": NewPostingsList(
-			NewPosting(0, 0),
-			NewPosting(2, 2)),
-		"for":  NewPostingsList(NewPosting(2, 6)),
-		"good": NewPostingsList(NewPosting(2, 11)),
-		"i":    NewPostingsList(NewPosting(2, 4, 8)),
-		"if":   NewPostingsList(NewPosting(2, 0)),
-		"man":  NewPostingsList(NewPosting(2, 13)),
-		"no": NewPostingsList(
-			NewPosting(1, 2),
-			NewPosting(3, 0)),
-		"quarrel": NewPostingsList(
-			NewPosting(0, 2), NewPosting(1, 0)),
-		"serve": NewPostingsList(NewPosting(2, 9)),
-		"sir": NewPostingsList(
-			NewPosting(0, 3),
-			NewPosting(1, 1, 3),
-			NewPosting(2, 3),
-			NewPosting(4, 1)),
-		"well": NewPostingsList(
-			NewPosting(4, 0)),
-		"you": NewPostingsList(
-			NewPosting(0, 1),
-			NewPosting(2, 1, 7, 15)),
-	}
-
-	idx := &Index{
-		Dictionary:     dictionary,
-		TotalDocsCount: 5,
+	idxStr := `
+{
+    "TotalDocsCount":5,
+    "Dictionary":{
+	"a":      [{"DocID":3,"Positions":[12],"TermFrequency":1}],
+	"am":     [{"DocID":3,"Positions":[5],"TermFrequency":1}],
+	"as":     [{"DocID":3,"Positions":[10,14],"TermFrequency":2}],
+	"better": [{"DocID":4,"Positions":[1],"TermFrequency":1}],
+	"do":     [{"DocID":1,"Positions":[0],"TermFrequency":1},
+               {"DocID":3,"Positions":[2],"TermFrequency":1}],
+	"for":    [{"DocID":3,"Positions":[6],"TermFrequency":1}],
+	"good":   [{"DocID":3,"Positions":[11],"TermFrequency":1}],
+	"i":      [{"DocID":3,"Positions":[4,8],"TermFrequency":2}],
+	"if":     [{"DocID":3,"Positions":[0],"TermFrequency":1}],
+	"man":    [{"DocID":3,"Positions":[13],"TermFrequency":1}],
+	"no":     [{"DocID":2,"Positions":[2],"TermFrequency":1},
+               {"DocID":4,"Positions":[0],"TermFrequency":1}],
+	"quarrel":[{"DocID":1,"Positions":[2],"TermFrequency":1},
+               {"DocID":2,"Positions":[0],"TermFrequency":1}],
+	"serve":  [{"DocID":3,"Positions":[9],"TermFrequency":1}],
+	"sir":    [{"DocID":1,"Positions":[3],"TermFrequency":1},
+               {"DocID":2,"Positions":[1,3],"TermFrequency":2},
+               {"DocID":3,"Positions":[3],"TermFrequency":1},
+               {"DocID":5,"Positions":[1],"TermFrequency":1}],
+	"well":   [{"DocID":5,"Positions":[0],"TermFrequency":1}],
+	"you":    [{"DocID":1,"Positions":[1],"TermFrequency":1},
+               {"DocID":3,"Positions":[1,7,15],"TermFrequency":3}]
+    }
+}
+`
+	idx := NewIndex()
+	if err := json.Unmarshal([]byte(idxStr), idx); err != nil {
+		t.Fatalf("failed to unmarshal idxStr: %v", err)
 	}
 	s := NewSearcher(idx)
 
-	query := []string{"quarrel", "sir"}
+	actual := s.searchTopK([]string{"quarrel", "sir"}, 1)
 
-	// when
-	actual := s.searchTopK(query, 4)
+	expected := &TopDocs{2,
+		[]*ScoreDoc{
+			{2, 3.9315685693241735},
+		},
+	}
 
-	expected := []docID{1, 0}
-
-	// TODO: 長さとスコアのチェック
-	for i, docID := range expected {
-		if actual.scoreDocs[i].docID != docID {
-			t.Fatalf("\ngot:\n%v\nexpected: %v\n", actual, expected)
-		}
+	// TODO: スコアは無視させる
+	for !reflect.DeepEqual(actual, expected) {
+		t.Fatalf("got:\n%v\nexpected:%v\n", actual, expected)
 	}
 }

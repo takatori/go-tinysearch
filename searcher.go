@@ -76,7 +76,7 @@ func (s *Searcher) calcScore() float64 {
 	return score
 }
 
-// カーソルを開く
+// 検索に使用するポスティングリストのポインタを取得する
 func (s *Searcher) openCursors(query []string) int {
 	// ポスティングリストの取得
 	postingLists := make([]PostingsList, 0, len(query))
@@ -102,6 +102,7 @@ func (s *Searcher) openCursors(query []string) int {
 	return len(cursors)
 }
 
+// 検索を実行し、マッチしたドキュメントをスコア付きで返す
 func (s *Searcher) search(query []string) ScoreDocs {
 
 	// クエリに含まれる単語のポスティングリストが
@@ -147,12 +148,12 @@ func (s *Searcher) search(query []string) ScoreDocs {
 	return docs
 }
 
-// 検索を実行する
+// 検索を実行し、スコアが高い順にK件結果を返す
 func (s *Searcher) searchTopK(query []string, k int) *TopDocs {
 
 	docs := s.search(query)
 
-	// 結果をarray型に変換後スコアの降順でソートして返す
+	// 結果をsliceに変換しスコアの降順でソートする
 	results := make([]*ScoreDoc, 0, len(docs))
 	for _, v := range docs {
 		results = append(results, v)
@@ -167,7 +168,7 @@ func (s *Searcher) searchTopK(query []string, k int) *TopDocs {
 	}
 
 	return &TopDocs{
-		totalHits: len(results),
+		totalHits: len(docs),
 		scoreDocs: results,
 	}
 }
