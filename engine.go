@@ -15,30 +15,35 @@ type Engine struct {
 	tokenizer     *Tokenizer     // トークンを分割する
 	indexer       *Indexer       // インデックスを作成する
 	documentStore *DocumentStore // ドキュメントを管理する
+	indexFile     string         // インデックスファイルのパス
 }
 
-// NewSearchEngine(db) create a searchTopK engine.
 // 検索エンジンを作成する処理
 func NewSearchEngine(db *sql.DB) *Engine {
 
 	tokenizer := NewTokenizer()
 	indexer := NewIndexer(tokenizer)
 	documentStore := NewDocumentStore(db)
+	indexFilePath, ok := os.LookupEnv("INDEX_FILE_PATH")
+	if !ok {
+		indexFilePath = "index.json"
+	}
 
 	return &Engine{
-		tokenizer,
-		indexer,
-		documentStore,
+		tokenizer:     tokenizer,
+		indexer:       indexer,
+		documentStore: documentStore,
+		indexFile:     indexFilePath,
 	}
 }
 
 // インデックスにドキュメントを追加する
 func (e *Engine) AddDocument(title string, reader io.Reader) error {
-	id, err := e.documentStore.save(title)
+	id, err := e.documentStore.save(title) // ❶ タイトルを保存しドキュメントIDを発行する
 	if err != nil {
 		return err
 	}
-	e.indexer.update(id, reader)
+	e.indexer.update(id, reader) // ❷ インデックスを更新する
 	return nil
 }
 
@@ -50,7 +55,7 @@ func (e *Engine) Flush() error {
 		return err
 	}
 
-	file, err := os.Create(`index.json`)
+	file, err := os.Create(e.indexFile)
 	if err != nil {
 		return err
 	}
@@ -74,7 +79,7 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 	terms := e.tokenizer.TextToWordSequence(query)
 
 	// インデックスを読み込む
-	file, err := os.Open(`index.json`)
+	file, err := os.Open(e.indexFile)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +106,9 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 		if err != nil {
 			return nil, err
 		}
-		results[i] = &SearchResult{result.docID, result.score, title}
+		results[i] = &SearchResult{
+			result.docID, result.score, title,
+		}
 	}
 	return results, nil
 }

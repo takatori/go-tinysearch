@@ -7,19 +7,22 @@ import (
 	"unicode"
 )
 
-type Tokenizer struct {}
+type Tokenizer struct{}
 
 func NewTokenizer() *Tokenizer {
 	return &Tokenizer{}
 }
 
 // io.Readerから読んだデータをトークンに分割する関数
-func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int,
+	token []byte, err error) {
 
 	advance, token, err = bufio.ScanWords(data, atEOF)
 
 	converter := func(r rune) rune {
-		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && !unicode.IsNumber(r) {
+		if (r < 'a' || r > 'z') &&
+			(r < 'A' || r > 'Z') &&
+			!unicode.IsNumber(r) {
 			return -1
 		}
 		return unicode.ToLower(r)

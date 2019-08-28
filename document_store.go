@@ -14,8 +14,8 @@ func NewDocumentStore(db *sql.DB) *DocumentStore {
 }
 
 func (ds *DocumentStore) save(title string) (DocumentID, error) {
-
-	result, err := ds.db.Exec(`INSERT INTO documents (document_title) VALUES (?)`, title)
+	query := "INSERT INTO documents (document_title) VALUES (?)"
+	result, err := ds.db.Exec(query, title)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,9 +23,9 @@ func (ds *DocumentStore) save(title string) (DocumentID, error) {
 	return DocumentID(id), err
 }
 
-// [For Search]
 func (ds *DocumentStore) fetchTitle(docID DocumentID) (string, error) {
-	row := ds.db.QueryRow(`SELECT document_title FROM documents WHERE document_id = ?`, docID)
+	query := "SELECT document_title FROM documents WHERE document_id = ?"
+	row := ds.db.QueryRow(query, docID)
 	var title string
 	err := row.Scan(&title)
 	return title, err

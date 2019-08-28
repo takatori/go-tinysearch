@@ -52,7 +52,6 @@ func TestSearchTopK(t *testing.T) {
 		},
 	}
 
-	// TODO: スコアは無視させる
 	for !reflect.DeepEqual(actual, expected) {
 		t.Fatalf("got:\n%v\nexpected:%v\n", actual, expected)
 	}

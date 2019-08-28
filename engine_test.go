@@ -36,16 +36,14 @@ func TestCreateIndex(t *testing.T) {
 	engine := NewSearchEngine(db) // ❶ 検索エンジンを初期化する
 
 	title := "test doc"
-	body := "Do you quarrel, sir?"
+	body := strings.NewReader("Do you quarrel, sir?")
 
 	// ❷ インデックスにドキュメントを追加する
-	err := engine.AddDocument("test doc", strings.NewReader(body))
-	if err != nil {
+	if err := engine.AddDocument("test doc", body); err != nil {
 		t.Fatalf("failed to add document to index %s: %v", title, err)
 	}
 	// ❸ インデックスをファイルに書き出して永続化
-	err = engine.Flush()
-	if err != nil {
+	if err := engine.Flush(); err != nil {
 		t.Fatalf("failed to save index to file :%v", err)
 	}
 
@@ -84,27 +82,26 @@ func TestCreateIndex(t *testing.T) {
 
 func TestSearch(t *testing.T) {
 
-}
+	db := setup()
+	defer db.Close()
+	engine := NewSearchEngine(db)
 
-/*
-	// [For Search]
-	// when
 	query := "Quarrel, sir."
-	actual, err := engine.Search(query, 5) // TODO: 検索に使用するインデックスファイルを指定できるようにする?
+	actual, err := engine.Search(query, 5)
 	if err != nil {
 		t.Fatalf("failed searchTopK: %v", err)
 	}
 
 	// then
-	expectedSearchResult := []*SearchResult{
+	expected := []*SearchResult{
 		{2, 0.66, "testdata/romeo_and_juliet_2.txt"},
 		{1, 0.59, "testdata/romeo_and_juliet_1.txt"},
 		{5, 0.21, "testdata/romeo_and_juliet_5.txt"},
 		{3, 0.03, "testdata/romeo_and_juliet_3.txt"},
 	}
 
-	for i := range expectedSearchResult {
-		if actual[i].DocumentID != expectedSearchResult[i].DocumentID {
-			t.Fatalf("\ngot:\n%v\nwant:\n%v\n", actual, expected)
-		}
-	}*/
+	for !reflect.DeepEqual(actual, expected) {
+		t.Fatalf("\ngot:\n%v\nwant:\n%v\n", actual, expected)
+	}
+
+}
