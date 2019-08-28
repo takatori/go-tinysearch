@@ -29,9 +29,9 @@ func (d ScoreDoc) String() string {
 
 // 検索処理に必要なデータを保持する
 type Searcher struct {
-	indexReader   *IndexReader   // インデックス読み込み器
+	indexReader   *IndexReader    // インデックス読み込み器
 	postingsLists []*PostingsList // クエリ内の用語に対応するポスティングリストの配列
-	cursors       []*Cursor      // ポスティングリストのポインタの配列
+	cursors       []*Cursor       // ポスティングリストのポインタの配列
 }
 
 func NewSearcher(reader *IndexReader) *Searcher {
@@ -118,6 +118,7 @@ func (s *Searcher) openCursors(query []string) int {
 	if len(postings) == 0 {
 		return 0
 	}
+
 	// ポスティングリストの短い順にソート
 	sort.Slice(postings, func(i, j int) bool {
 		return postings[i].Len() < postings[j].Len()
@@ -136,8 +137,10 @@ func (s *Searcher) openCursors(query []string) int {
 func (s *Searcher) calcScore() float64 {
 	var score float64
 	for i := 0; i < len(s.cursors); i++ {
-		score += calcTF(s.cursors[i].Posting().TermFrequency) *
-			calIDF(s.indexReader.totalDocCount(), s.postingsLists[i].Len())
+		termFrq := s.cursors[i].Posting().TermFrequency
+		totalDocCount := s.indexReader.totalDocCount()
+		docCount := s.postingsLists[i].Len()
+		score += calcTF(termFrq) * calIDF(totalDocCount, docCount)
 	}
 	return score
 }

@@ -11,7 +11,6 @@ type Engine struct {
 	tokenizer     *Tokenizer     // トークンを分割する
 	indexer       *Indexer       // インデックスを作成する
 	documentStore *DocumentStore // ドキュメントを管理する
-	indexFile     string         // インデックスファイルのパス
 }
 
 // 検索エンジンを作成する処理

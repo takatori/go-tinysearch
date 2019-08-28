@@ -41,16 +41,18 @@ func (r *IndexReader) postingsLists(query []string) []*PostingsList {
 
 	postingLists := make([]*PostingsList, 0, len(query))
 	for _, term := range query {
-		postings, _ := r.postings(term) // TODO: error handling
-		postingLists = append(postingLists, postings)
+		if postings, _ := r.postings(term); postings != nil { // TODO: error handling
+			postingLists = append(postingLists, postings)
+		}
 	}
 	return postingLists
 }
 
 func (r *IndexReader) totalDocCount() int {
+	// TODO: キャッシュを持つようにする
 	file, err := os.Open(r.path + "/_0.dc")
 	if err != nil {
-		return 0 // TODO: fix
+		return 0 // TODO: fix panicでよいのでは？
 	}
 	defer file.Close()
 	bytes, err := ioutil.ReadAll(file)

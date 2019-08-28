@@ -13,7 +13,6 @@ import (
 
 var testDB *sql.DB
 
-// DBの初期化を行う関数
 func setup() *sql.DB {
 	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3306)/tinysearch")
 	if err != nil {
@@ -23,7 +22,12 @@ func setup() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// TODO: _index_dataディレクトリ削除
+	if err := os.RemoveAll("_index_data"); err != nil {
+		log.Fatal(err)
+	}
+	if err := os.Mkdir("_index_data", 0777); err != nil {
+		log.Fatal(err)
+	}
 	return db
 }
 
@@ -39,28 +43,39 @@ func TestCreateIndex(t *testing.T) {
 
 	engine := NewSearchEngine(testDB) // ❶ 検索エンジンを初期化する
 
-	title := "test doc"
-	body := strings.NewReader("Do you quarrel, sir?")
-
-	// ❷ インデックスにドキュメントを追加する
-	if err := engine.AddDocument("test doc", body); err != nil {
-		t.Fatalf("failed to add document to index %s: %v", title, err)
+	type docData struct {
+		title string
+		body  string
 	}
+	docs := []docData{
+		{"test1", "Do you quarrel, sir?"},
+		{"test2", "No better."},
+		{"test3", "Quarrel sir! no, sir!"},
+	}
+	for _, doc := range docs {
+		// ❷ インデックスにドキュメントを追加する
+		r := strings.NewReader(doc.body)
+		if err := engine.AddDocument(doc.title, r); err != nil {
+			t.Fatalf("failed to add document to index %s: %v", doc.title, err)
+		}
+	}
+
 	// ❸ インデックスをファイルに書き出して永続化
 	if err := engine.Flush(); err != nil {
 		t.Fatalf("failed to save index to file :%v", err)
 	}
+
 	type testCase struct {
 		file        string
 		postingsStr string
 	}
-
-	// TODO: 増やす
 	testCases := []testCase{
-		{"_index_data/_0.dc", "1"},
+		{"_index_data/_0.dc", "3"},
+		{"_index_data/better.json", `[{"DocID":2,"Positions":[1],"TermFrequency":1}]`},
+		{"_index_data/no.json", `[{"DocID":2,"Positions":[0],"TermFrequency":1},{"DocID":3,"Positions":[2],"TermFrequency":1}]`},
 		{"_index_data/do.json", `[{"DocID":1,"Positions":[0],"TermFrequency":1}]`},
-		{"_index_data/quarrel.json", `[{"DocID":1,"Positions":[2],"TermFrequency":1}]`},
-		{"_index_data/sir.json", `[{"DocID":1,"Positions":[3],"TermFrequency":1}]`},
+		{"_index_data/quarrel.json", `[{"DocID":1,"Positions":[2],"TermFrequency":1},{"DocID":3,"Positions":[0],"TermFrequency":1}]`},
+		{"_index_data/sir.json", `[{"DocID":1,"Positions":[3],"TermFrequency":1},{"DocID":3,"Positions":[1,3],"TermFrequency":2}]`},
 		{"_index_data/you.json", `[{"DocID":1,"Positions":[1],"TermFrequency":1}]`},
 	}
 
@@ -94,9 +109,9 @@ func TestSearch(t *testing.T) {
 		t.Fatalf("failed searchTopK: %v", err)
 	}
 
-	// then
 	expected := []*SearchResult{
-		{1, 0, "test doc"},
+		{3, 1.754887502163469, "test3"},
+		{1, 1.1699250014423126, "test1"},
 	}
 
 	for !reflect.DeepEqual(actual, expected) {
