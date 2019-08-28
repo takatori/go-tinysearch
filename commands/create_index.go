@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"database/sql"
 	"github.com/takatori/go-tinysearch"
 	"github.com/urfave/cli"
 	"os"
@@ -12,7 +13,7 @@ func createIndex(c *cli.Context) error {
 	if err := checkArgs(c, 1, exactArgs); err != nil {
 		return err
 	}
-	db, err := db()
+	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3306)/tinysearch")
 	if err != nil {
 		return err
 	}

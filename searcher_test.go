@@ -42,13 +42,13 @@ func TestSearchTopK(t *testing.T) {
 	if err := json.Unmarshal([]byte(idxStr), idx); err != nil {
 		t.Fatalf("failed to unmarshal idxStr: %v", err)
 	}
-	s := NewSearcher(idx)
+	s := NewSearcher(idx) // ❶ searcherの初期化
 
-	actual := s.searchTopK([]string{"quarrel", "sir"}, 1)
+	actual := s.searchTopK([]string{"quarrel", "sir"}, 1) // ❷ 検索の実行
 
 	expected := &TopDocs{2,
 		[]*ScoreDoc{
-			{2, 3.9315685693241735},
+			{2, 1.9657842846620868},
 		},
 	}
 

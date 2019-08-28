@@ -97,31 +97,31 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 
 	// 検索を実行
 	searcher := NewSearcher(idx)
-	docs := searcher.searchTopK(terms, 10)
+	docs := searcher.searchTopK(terms, k)
 
 	// タイトルを取得
-	results := make([]*SearchResult, docs.totalHits)
-	for i, result := range docs.scoreDocs {
+	results := make([]*SearchResult, 0, k)
+	for _, result := range docs.scoreDocs {
 		title, err := e.documentStore.fetchTitle(result.docID)
 		if err != nil {
 			return nil, err
 		}
-		results[i] = &SearchResult{
+		results = append(results, &SearchResult{
 			result.docID, result.score, title,
-		}
+		})
 	}
 	return results, nil
 }
 
 // 検索結果を格納する構造体
 type SearchResult struct {
-	docID DocumentID
-	score float64
-	title string
+	DocID DocumentID
+	Score float64
+	Title string
 }
 
 // String print searchTopK result info
 func (r *SearchResult) String() string {
-	return fmt.Sprintf("{DocID: %v, score: %v, title: %v}",
-		r.docID, r.score, r.title)
+	return fmt.Sprintf("{DocID: %v, Score: %v, Title: %v}",
+		r.DocID, r.Score, r.Title)
 }

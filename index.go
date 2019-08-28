@@ -104,7 +104,6 @@ func (pl PostingsList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(postings)
 }
 
-// [For Search]
 func (pl *PostingsList) UnmarshalJSON(b []byte) error {
 
 	var postings []*Posting
@@ -146,7 +145,7 @@ type Cursor struct {
 	current *list.Element
 }
 
-func (pl PostingsList) openCursor() *Cursor {
+func (pl PostingsList) OpenCursor() *Cursor {
 	return &Cursor{pl.Front()}
 }
 
