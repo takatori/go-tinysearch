@@ -1,13 +1,9 @@
 package tinysearch
 
 import (
-	"bufio"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
 )
 
 // 検索エンジン
@@ -24,16 +20,11 @@ func NewSearchEngine(db *sql.DB) *Engine {
 	tokenizer := NewTokenizer()
 	indexer := NewIndexer(tokenizer)
 	documentStore := NewDocumentStore(db)
-	indexFilePath, ok := os.LookupEnv("INDEX_FILE_PATH")
-	if !ok {
-		indexFilePath = "index.json"
-	}
 
 	return &Engine{
 		tokenizer:     tokenizer,
 		indexer:       indexer,
 		documentStore: documentStore,
-		indexFile:     indexFilePath,
 	}
 }
 
@@ -50,24 +41,8 @@ func (e *Engine) AddDocument(title string, reader io.Reader) error {
 // インデックスをファイルに書き出す
 func (e *Engine) Flush() error {
 
-	bytes, err := json.Marshal(e.indexer.index)
-	if err != nil {
-		return err
-	}
-
-	file, err := os.Create(e.indexFile)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	writer := bufio.NewWriter(file)
-
-	_, err = writer.Write(bytes)
-	if err != nil {
-		return err
-	}
-	return writer.Flush()
+	writer := NewIndexWriter("_index_data") // TODO: configを渡すようにする
+	return writer.flush(e.indexer.index)
 
 	// TODO: indexer.indexを空にする？
 }
@@ -78,25 +53,8 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 	// クエリをトークンに分割
 	terms := e.tokenizer.TextToWordSequence(query)
 
-	// インデックスを読み込む
-	file, err := os.Open(e.indexFile)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	idx := NewIndex()
-	if err := json.Unmarshal(bytes, idx); err != nil {
-		return nil, err
-	}
-
 	// 検索を実行
-	searcher := NewSearcher(idx)
+	searcher := NewSearcher(NewIndexReader("_index_data"))
 	docs := searcher.searchTopK(terms, k)
 
 	// タイトルを取得

@@ -1,0 +1,16 @@
+[
+  {
+    "DocID": 2,
+    "Positions": [
+      2
+    ],
+    "TermFrequency": 1
+  },
+  {
+    "DocID": 2,
+    "Positions": [
+      0
+    ],
+    "TermFrequency": 1
+  }
+]

@@ -29,13 +29,13 @@ func (d ScoreDoc) String() string {
 
 // 検索処理に必要なデータを保持する
 type Searcher struct {
-	index         *Index         // インデックス
-	postingsLists []PostingsList // クエリ内の用語に対応するポスティングリストの配列
+	indexReader   *IndexReader   // インデックス読み込み器
+	postingsLists []*PostingsList // クエリ内の用語に対応するポスティングリストの配列
 	cursors       []*Cursor      // ポスティングリストのポインタの配列
 }
 
-func NewSearcher(idx *Index) *Searcher {
-	return &Searcher{index: idx}
+func NewSearcher(reader *IndexReader) *Searcher {
+	return &Searcher{indexReader: reader}
 }
 
 // 検索を実行し、スコアが高い順にK件結果を返す
@@ -112,26 +112,22 @@ func (s *Searcher) search(query []string) []*ScoreDoc {
 
 // 検索に使用するポスティングリストのポインタを取得する
 func (s *Searcher) openCursors(query []string) int {
-	// ポスティングリストの取得
-	postingLists := make([]PostingsList, 0, len(query))
-	for _, term := range query {
-		if postingList, ok := s.index.Dictionary[term]; ok {
-			postingLists = append(postingLists, postingList)
-		}
-	}
-	if len(postingLists) == 0 {
+
+	// ポスティングリストを取得
+	postings := s.indexReader.postingsLists(query)
+	if len(postings) == 0 {
 		return 0
 	}
 	// ポスティングリストの短い順にソート
-	sort.Slice(postingLists, func(i, j int) bool {
-		return postingLists[i].Len() < postingLists[j].Len()
+	sort.Slice(postings, func(i, j int) bool {
+		return postings[i].Len() < postings[j].Len()
 	})
 	// 各ポスティングリストに対するcursorの取得
-	cursors := make([]*Cursor, len(postingLists))
-	for i, postingList := range postingLists {
+	cursors := make([]*Cursor, len(postings))
+	for i, postingList := range postings {
 		cursors[i] = postingList.OpenCursor()
 	}
-	s.postingsLists = postingLists
+	s.postingsLists = postings
 	s.cursors = cursors
 	return len(cursors)
 }
@@ -141,7 +137,7 @@ func (s *Searcher) calcScore() float64 {
 	var score float64
 	for i := 0; i < len(s.cursors); i++ {
 		score += calcTF(s.cursors[i].Posting().TermFrequency) *
-			calIDF(s.index.TotalDocsCount, s.postingsLists[i].Len())
+			calIDF(s.indexReader.totalDocCount(), s.postingsLists[i].Len())
 	}
 	return score
 }

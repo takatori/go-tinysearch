@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/takatori/go-tinysearch"
 	"github.com/urfave/cli"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -24,6 +25,7 @@ func createIndex(c *cli.Context) error {
 	var files []string
 	dir := c.Args().Get(0)
 
+	// 指定されたディレクトリ配下の.txtファイルのパスをすべて取得
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() || filepath.Ext(path) != ".txt" {
 			return nil
@@ -42,16 +44,16 @@ func createIndex(c *cli.Context) error {
 				return err
 			}
 			defer fp.Close()
-
-			err = engine.AddDocument(file, fp)
-
-			if err != nil {
+			// ドキュメントの追加
+			if err = engine.AddDocument(file, fp); err != nil {
 				return err
 			}
+			log.Printf("add document to index: %s\n", file)
 			return nil
 		}()
 	}
 
+	// インデックスを永続化
 	if err := engine.Flush(); err != nil {
 		return err
 	}

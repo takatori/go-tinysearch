@@ -23,7 +23,7 @@ func search(c *cli.Context) error {
 	defer db.Close()
 	engine := tinysearch.NewSearchEngine(db)
 
-	result, err := engine.Search(query, 10)
+	result, err := engine.Search(query, 100)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func printResult(results []*tinysearch.SearchResult) {
 
 	strs := make([]string, len(results))
 	for i, result := range results {
-		strs[i] = fmt.Sprintf("rank: %3d, score: %f, title: %s",
+		strs[i] = fmt.Sprintf("rank: %3d, score: %v, title: %s",
 			i+1, result.Score, result.Title)
 	}
 	fmt.Println(strings.Join(strs, "\n"))

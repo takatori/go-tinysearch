@@ -35,7 +35,6 @@ func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int,
 	return
 }
 
-// [For Search]
 // 文字列を分解する処理
 func (t *Tokenizer) TextToWordSequence(text string) []string {
 	scanner := bufio.NewScanner(strings.NewReader(text))
