@@ -23,7 +23,7 @@ func search(c *cli.Context) error {
 	defer db.Close()
 	engine := tinysearch.NewSearchEngine(db)
 
-	result, err := engine.Search(query, 100)
+	result, err := engine.Search(query, 100) // TODO: option
 	if err != nil {
 		return err
 	}

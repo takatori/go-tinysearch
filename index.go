@@ -140,13 +140,17 @@ func (pl PostingsList) String() string {
 	return strings.Join(str, "=>")
 }
 
-// 現在の読み込み位置を表すポインタ
+// ポスティングリストをたどるためのカーソル
 type Cursor struct {
-	current *list.Element
+	postingsList *PostingsList // cursorがたどっているポスティングリストへの参照
+	current      *list.Element // 現在の読み込み位置
 }
 
 func (pl PostingsList) OpenCursor() *Cursor {
-	return &Cursor{pl.Front()}
+	return &Cursor{
+		postingsList: &pl,
+		current:      pl.Front(),
+	}
 }
 
 func (c *Cursor) Next() {

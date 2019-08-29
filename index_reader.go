@@ -2,7 +2,6 @@ package tinysearch
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,34 +19,34 @@ func NewIndexReader(path string) *IndexReader {
 	return &IndexReader{
 		path,
 		cache,
-		0,
+		-1,
 	}
 }
 
-func (r *IndexReader) postings(term string) (*PostingsList, error) {
+func (r *IndexReader) postings(term string) *PostingsList {
 
 	// すでに取得済みであればキャッシュを返す
 	if postingsList, ok := r.postingsCache[term]; ok {
-		return postingsList, nil
+		return postingsList
 	}
 
 	// インデックスファイルの取得
 	filename := filepath.Join(r.indexDir, term)
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	defer file.Close()
 
 	bytes, err := ioutil.ReadAll(file)
 	var postingsList PostingsList
 	if err := json.Unmarshal(bytes, &postingsList); err != nil {
-		return nil, err
+		return nil
 	}
 
 	// キャッシュの更新
 	r.postingsCache[term] = &postingsList
-	return &postingsList, nil
+	return &postingsList
 
 }
 
@@ -55,9 +54,7 @@ func (r *IndexReader) postings(term string) (*PostingsList, error) {
 func (r *IndexReader) postingsLists(query []string) []*PostingsList {
 	postingLists := make([]*PostingsList, 0, len(query))
 	for _, term := range query {
-		if postings, err := r.postings(term); err != nil {
-			fmt.Printf("failed to load postings of %s: %v", term, err)
-		} else if postings != nil {
+		if postings := r.postings(term); postings != nil {
 			postingLists = append(postingLists, postings)
 		}
 	}
@@ -65,17 +62,19 @@ func (r *IndexReader) postingsLists(query []string) []*PostingsList {
 }
 
 func (r *IndexReader) totalDocCount() int {
-
 	if r.docCountCache > 0 {
 		return r.docCountCache
 	}
 	filename := filepath.Join(r.indexDir, "_0.dc")
 	file, err := os.Open(filename)
 	if err != nil {
-		return 0 // TODO: fix panicでよいのでは？
+		return 0 // TODO: 説明を書く
 	}
 	defer file.Close()
 	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return 0
+	}
 	count, err := strconv.Atoi(string(bytes))
 	if err != nil {
 		return 0

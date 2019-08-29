@@ -13,7 +13,7 @@ type Engine struct {
 	tokenizer     *Tokenizer     // トークンを分割する
 	indexer       *Indexer       // インデックスを作成する
 	documentStore *DocumentStore // ドキュメントを管理する
-	indexDir      string
+	indexDir      string         // インデックスファイルを保存するディレクトリ
 }
 
 // 検索エンジンを作成する処理

@@ -29,9 +29,8 @@ func (d ScoreDoc) String() string {
 
 // 検索処理に必要なデータを保持する
 type Searcher struct {
-	indexReader   *IndexReader    // インデックス読み込み器
-	postingsLists []*PostingsList // クエリ内の用語に対応するポスティングリストの配列
-	cursors       []*Cursor       // ポスティングリストのポインタの配列
+	indexReader *IndexReader // インデックス読み込み器
+	cursors     []*Cursor    // ポスティングリストのポインタの配列
 }
 
 func NewSearcher(path string) *Searcher {
@@ -74,7 +73,7 @@ func (s *Searcher) search(query []string) []*ScoreDoc {
 	cursors := s.cursors[1:]
 
 	// 結果を格納する構造体の初期化
-	docs := make([]*ScoreDoc, 0, 100) // ここの容量は適当
+	docs := make([]*ScoreDoc, 0)
 
 	for !c.Empty() {
 
@@ -111,6 +110,7 @@ func (s *Searcher) search(query []string) []*ScoreDoc {
 }
 
 // 検索に使用するポスティングリストのポインタを取得する
+// 作成したカーソルの数を返す
 func (s *Searcher) openCursors(query []string) int {
 
 	// ポスティングリストを取得
@@ -118,7 +118,6 @@ func (s *Searcher) openCursors(query []string) int {
 	if len(postings) == 0 {
 		return 0
 	}
-
 	// ポスティングリストの短い順にソート
 	sort.Slice(postings, func(i, j int) bool {
 		return postings[i].Len() < postings[j].Len()
@@ -128,7 +127,6 @@ func (s *Searcher) openCursors(query []string) int {
 	for i, postingList := range postings {
 		cursors[i] = postingList.OpenCursor()
 	}
-	s.postingsLists = postings
 	s.cursors = cursors
 	return len(cursors)
 }
@@ -139,7 +137,7 @@ func (s *Searcher) calcScore() float64 {
 	for i := 0; i < len(s.cursors); i++ {
 		termFrq := s.cursors[i].Posting().TermFrequency
 		totalDocCount := s.indexReader.totalDocCount()
-		docCount := s.postingsLists[i].Len()
+		docCount := s.cursors[i].postingsList.Len()
 		score += calcTF(termFrq) * calIDF(totalDocCount, docCount)
 	}
 	return score

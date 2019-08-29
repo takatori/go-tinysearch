@@ -12,7 +12,6 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "tinysearch"
-	app.Author = "Satoshi Takatori"
 	app.Usage = `simple and small search engine for learning`
 	app.Version = "0.0.1"
 	app.Commands = commands.Commands
