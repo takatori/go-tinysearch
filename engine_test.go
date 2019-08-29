@@ -71,12 +71,12 @@ func TestCreateIndex(t *testing.T) {
 	}
 	testCases := []testCase{
 		{"_index_data/_0.dc", "3"},
-		{"_index_data/better.json", `[{"DocID":2,"Positions":[1],"TermFrequency":1}]`},
-		{"_index_data/no.json", `[{"DocID":2,"Positions":[0],"TermFrequency":1},{"DocID":3,"Positions":[2],"TermFrequency":1}]`},
-		{"_index_data/do.json", `[{"DocID":1,"Positions":[0],"TermFrequency":1}]`},
-		{"_index_data/quarrel.json", `[{"DocID":1,"Positions":[2],"TermFrequency":1},{"DocID":3,"Positions":[0],"TermFrequency":1}]`},
-		{"_index_data/sir.json", `[{"DocID":1,"Positions":[3],"TermFrequency":1},{"DocID":3,"Positions":[1,3],"TermFrequency":2}]`},
-		{"_index_data/you.json", `[{"DocID":1,"Positions":[1],"TermFrequency":1}]`},
+		{"_index_data/better", `[{"DocID":2,"Positions":[1],"TermFrequency":1}]`},
+		{"_index_data/no", `[{"DocID":2,"Positions":[0],"TermFrequency":1},{"DocID":3,"Positions":[2],"TermFrequency":1}]`},
+		{"_index_data/do", `[{"DocID":1,"Positions":[0],"TermFrequency":1}]`},
+		{"_index_data/quarrel", `[{"DocID":1,"Positions":[2],"TermFrequency":1},{"DocID":3,"Positions":[0],"TermFrequency":1}]`},
+		{"_index_data/sir", `[{"DocID":1,"Positions":[3],"TermFrequency":1},{"DocID":3,"Positions":[1,3],"TermFrequency":2}]`},
+		{"_index_data/you", `[{"DocID":1,"Positions":[1],"TermFrequency":1}]`},
 	}
 
 	for _, testCase := range testCases {

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 )
 
 // 検索エンジン
@@ -11,6 +13,7 @@ type Engine struct {
 	tokenizer     *Tokenizer     // トークンを分割する
 	indexer       *Indexer       // インデックスを作成する
 	documentStore *DocumentStore // ドキュメントを管理する
+	indexDir      string
 }
 
 // 検索エンジンを作成する処理
@@ -20,10 +23,17 @@ func NewSearchEngine(db *sql.DB) *Engine {
 	indexer := NewIndexer(tokenizer)
 	documentStore := NewDocumentStore(db)
 
+	path, ok := os.LookupEnv("INDEX_DIR_PATH")
+	if !ok {
+		current, _ := os.Getwd()
+		path = filepath.Join(current, "_index_data")
+	}
+
 	return &Engine{
 		tokenizer:     tokenizer,
 		indexer:       indexer,
 		documentStore: documentStore,
+		indexDir:      path,
 	}
 }
 
@@ -39,11 +49,8 @@ func (e *Engine) AddDocument(title string, reader io.Reader) error {
 
 // インデックスをファイルに書き出す
 func (e *Engine) Flush() error {
-
-	writer := NewIndexWriter("_index_data") // TODO: configを渡すようにする
+	writer := NewIndexWriter(e.indexDir)
 	return writer.flush(e.indexer.index)
-
-	// TODO: indexer.indexを空にする？
 }
 
 // 検索を実行する
@@ -53,8 +60,7 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 	terms := e.tokenizer.TextToWordSequence(query)
 
 	// 検索を実行
-	searcher := NewSearcher(NewIndexReader("_index_data"))
-	docs := searcher.searchTopK(terms, k)
+	docs := NewSearcher(e.indexDir).searchTopK(terms, k)
 
 	// タイトルを取得
 	results := make([]*SearchResult, 0, k)

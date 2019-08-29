@@ -7,9 +7,7 @@ import (
 
 func TestSearchTopK(t *testing.T) {
 
-	reader := NewIndexReader("testdata/index")
-	s := NewSearcher(reader) // ❶ searcherの初期化
-
+	s := NewSearcher("testdata/index") // ❶ searcherの初期化
 	actual := s.searchTopK([]string{"quarrel", "sir"}, 1) // ❷ 検索の実行
 
 	expected := &TopDocs{2,

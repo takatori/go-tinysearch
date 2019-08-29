@@ -3,33 +3,35 @@ package tinysearch
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
 type IndexWriter struct {
-	path string
+	indexDir string
 }
 
 func NewIndexWriter(path string) *IndexWriter {
 	return &IndexWriter{path}
 }
 
-func (w *IndexWriter) writePostingsList(term string, postingsList PostingsList) error {
+func (w *IndexWriter) postingsList(term string, postingsList PostingsList) error {
 
 	bytes, err := json.Marshal(postingsList)
 	if err != nil {
 		return err
 	}
 
-	file, err := os.Create(w.path + "/" + term + ".json")
+	filename := filepath.Join(w.indexDir, term)
+	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-
 	_, err = writer.Write(bytes)
 	if err != nil {
 		return err
@@ -37,8 +39,9 @@ func (w *IndexWriter) writePostingsList(term string, postingsList PostingsList) 
 	return writer.Flush()
 }
 
-func (w *IndexWriter) writeDocCount(count int) error {
-	file, err := os.Create(w.path + "/_0.dc")
+func (w *IndexWriter) docCount(count int) error {
+	filename := filepath.Join(w.indexDir, "_0.dc")
+	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -49,7 +52,9 @@ func (w *IndexWriter) writeDocCount(count int) error {
 
 func (w *IndexWriter) flush(index *Index) error {
 	for term, postingsList := range index.Dictionary {
-		w.writePostingsList(term, postingsList) // todo: error handling
+		if err := w.postingsList(term, postingsList); err != nil {
+			fmt.Printf("failed to save postings of %s: %v", term, err)
+		}
 	}
-	return w.writeDocCount(index.TotalDocsCount)
+	return w.docCount(index.TotalDocsCount)
 }

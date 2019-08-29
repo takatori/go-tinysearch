@@ -5,21 +5,35 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
 type IndexReader struct {
-	path string
-	// PostingsLists map[string]PostingsList TODO: fix
+	indexDir      string
+	postingsCache map[string]*PostingsList
+	docCountCache int
 }
 
 func NewIndexReader(path string) *IndexReader {
-	return &IndexReader{path}
+	cache := make(map[string]*PostingsList)
+	return &IndexReader{
+		path,
+		cache,
+		0,
+	}
 }
 
 func (r *IndexReader) postings(term string) (*PostingsList, error) {
 
-	file, err := os.Open(fmt.Sprintf("%s/%s.json", r.path, term))
+	// すでに取得済みであればキャッシュを返す
+	if postingsList, ok := r.postingsCache[term]; ok {
+		return postingsList, nil
+	}
+
+	// インデックスファイルの取得
+	filename := filepath.Join(r.indexDir, term)
+	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -27,21 +41,23 @@ func (r *IndexReader) postings(term string) (*PostingsList, error) {
 
 	bytes, err := ioutil.ReadAll(file)
 	var postingsList PostingsList
-
 	if err := json.Unmarshal(bytes, &postingsList); err != nil {
 		return nil, err
 	}
 
+	// キャッシュの更新
+	r.postingsCache[term] = &postingsList
 	return &postingsList, nil
 
 }
 
 // ポスティングリストの取得
 func (r *IndexReader) postingsLists(query []string) []*PostingsList {
-
 	postingLists := make([]*PostingsList, 0, len(query))
 	for _, term := range query {
-		if postings, _ := r.postings(term); postings != nil { // TODO: error handling
+		if postings, err := r.postings(term); err != nil {
+			fmt.Printf("failed to load postings of %s: %v", term, err)
+		} else if postings != nil {
 			postingLists = append(postingLists, postings)
 		}
 	}
@@ -49,8 +65,12 @@ func (r *IndexReader) postingsLists(query []string) []*PostingsList {
 }
 
 func (r *IndexReader) totalDocCount() int {
-	// TODO: キャッシュを持つようにする
-	file, err := os.Open(r.path + "/_0.dc")
+
+	if r.docCountCache > 0 {
+		return r.docCountCache
+	}
+	filename := filepath.Join(r.indexDir, "_0.dc")
+	file, err := os.Open(filename)
 	if err != nil {
 		return 0 // TODO: fix panicでよいのでは？
 	}
@@ -60,5 +80,6 @@ func (r *IndexReader) totalDocCount() int {
 	if err != nil {
 		return 0
 	}
+	r.docCountCache = count
 	return count
 }

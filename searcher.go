@@ -34,8 +34,8 @@ type Searcher struct {
 	cursors       []*Cursor       // ポスティングリストのポインタの配列
 }
 
-func NewSearcher(reader *IndexReader) *Searcher {
-	return &Searcher{indexReader: reader}
+func NewSearcher(path string) *Searcher {
+	return &Searcher{indexReader: NewIndexReader(path)}
 }
 
 // 検索を実行し、スコアが高い順にK件結果を返す
