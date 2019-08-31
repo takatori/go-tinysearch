@@ -60,7 +60,7 @@ func (e *Engine) Search(query string, k int) ([]*SearchResult, error) {
 	terms := e.tokenizer.TextToWordSequence(query)
 
 	// 検索を実行
-	docs := NewSearcher(e.indexDir).searchTopK(terms, k)
+	docs := NewSearcher(e.indexDir).SearchTopK(terms, k)
 
 	// タイトルを取得
 	results := make([]*SearchResult, 0, k)
@@ -83,7 +83,7 @@ type SearchResult struct {
 	Title string
 }
 
-// String print searchTopK result info
+// String print SearchTopK result info
 func (r *SearchResult) String() string {
 	return fmt.Sprintf("{DocID: %v, Score: %v, Title: %v}",
 		r.DocID, r.Score, r.Title)

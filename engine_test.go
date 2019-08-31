@@ -106,7 +106,7 @@ func TestSearch(t *testing.T) {
 	query := "Quarrel, sir."
 	actual, err := engine.Search(query, 5)
 	if err != nil {
-		t.Fatalf("failed searchTopK: %v", err)
+		t.Fatalf("failed SearchTopK: %v", err)
 	}
 
 	expected := []*SearchResult{

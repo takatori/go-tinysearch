@@ -38,7 +38,7 @@ func NewSearcher(path string) *Searcher {
 }
 
 // 検索を実行し、スコアが高い順にK件結果を返す
-func (s *Searcher) searchTopK(query []string, k int) *TopDocs {
+func (s *Searcher) SearchTopK(query []string, k int) *TopDocs {
 
 	// ❶ マッチするドキュメントを抽出しスコアを計算する
 	results := s.search(query)
