@@ -45,10 +45,11 @@ func createIndex(c *cli.Context) error {
 				return err
 			}
 			defer fp.Close()
-			if err = engine.AddDocument(file, fp); err != nil {
+			title := filepath.Base(file)
+			if err = engine.AddDocument(title, fp); err != nil {
 				return err
 			}
-			log.Printf("add document to index: %s\n", file)
+			log.Printf("add document to index: %s\n", title)
 			return nil
 		}()
 		if err != nil {

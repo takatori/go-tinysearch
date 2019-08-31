@@ -41,7 +41,7 @@ func printResult(results []*tinysearch.SearchResult) {
 
 	strs := make([]string, len(results))
 	for i, result := range results {
-		strs[i] = fmt.Sprintf("rank: %3d, score: %v, title: %s",
+		strs[i] = fmt.Sprintf("rank: %3d, score: %4f, title: %s",
 			i+1, result.Score, result.Title)
 	}
 	fmt.Println(strings.Join(strs, "\n"))

@@ -17,6 +17,17 @@ func NewIndexWriter(path string) *IndexWriter {
 	return &IndexWriter{path}
 }
 
+// インデックスをファイルに保存する
+func (w *IndexWriter) flush(index *Index) error {
+	for term, postingsList := range index.Dictionary {
+		if err := w.postingsList(term, postingsList); err != nil {
+			fmt.Printf("failed to save %s postings list: %v", term, err)
+		}
+	}
+	return w.docCount(index.TotalDocsCount)
+}
+
+// ポスティングリストをファイルに保存する
 func (w *IndexWriter) postingsList(term string, postingsList PostingsList) error {
 
 	bytes, err := json.Marshal(postingsList)
@@ -39,6 +50,7 @@ func (w *IndexWriter) postingsList(term string, postingsList PostingsList) error
 	return writer.Flush()
 }
 
+// インデックスされたドキュメント総数をファイルに保存する
 func (w *IndexWriter) docCount(count int) error {
 	filename := filepath.Join(w.indexDir, "_0.dc")
 	file, err := os.Create(filename)
@@ -48,13 +60,4 @@ func (w *IndexWriter) docCount(count int) error {
 	defer file.Close()
 	_, err = file.Write([]byte(strconv.Itoa(count)))
 	return err
-}
-
-func (w *IndexWriter) flush(index *Index) error {
-	for term, postingsList := range index.Dictionary {
-		if err := w.postingsList(term, postingsList); err != nil {
-			fmt.Printf("failed to save postings of %s: %v", term, err)
-		}
-	}
-	return w.docCount(index.TotalDocsCount)
 }

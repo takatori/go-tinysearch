@@ -135,10 +135,10 @@ func (s *Searcher) openCursors(query []string) int {
 func (s *Searcher) calcScore() float64 {
 	var score float64
 	for i := 0; i < len(s.cursors); i++ {
-		termFrq := s.cursors[i].Posting().TermFrequency
-		totalDocCount := s.indexReader.totalDocCount()
+		termFreq := s.cursors[i].Posting().TermFrequency
 		docCount := s.cursors[i].postingsList.Len()
-		score += calcTF(termFrq) * calIDF(totalDocCount, docCount)
+		totalDocCount := s.indexReader.totalDocCount()
+		score += calcTF(termFreq) * calIDF(totalDocCount, docCount)
 	}
 	return score
 }

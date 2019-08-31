@@ -61,6 +61,7 @@ func (r *IndexReader) postingsLists(query []string) []*PostingsList {
 	return postingLists
 }
 
+// インデックスされたドキュメントの総数を取得
 func (r *IndexReader) totalDocCount() int {
 	if r.docCountCache > 0 {
 		return r.docCountCache

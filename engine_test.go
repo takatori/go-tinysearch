@@ -43,11 +43,11 @@ func TestCreateIndex(t *testing.T) {
 
 	engine := NewSearchEngine(testDB) // ❶ 検索エンジンを初期化する
 
-	type docData struct {
+	type testDoc struct {
 		title string
 		body  string
 	}
-	docs := []docData{
+	docs := []testDoc{
 		{"test1", "Do you quarrel, sir?"},
 		{"test2", "No better."},
 		{"test3", "Quarrel sir! no, sir!"},
@@ -56,7 +56,7 @@ func TestCreateIndex(t *testing.T) {
 		// ❷ インデックスにドキュメントを追加する
 		r := strings.NewReader(doc.body)
 		if err := engine.AddDocument(doc.title, r); err != nil {
-			t.Fatalf("failed to add document to index %s: %v", doc.title, err)
+			t.Fatalf("failed to add document %s: %v", doc.title, err)
 		}
 	}
 
@@ -90,10 +90,10 @@ func TestCreateIndex(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to load index: %v", err)
 			}
-			actual := string(bytes)
-			expected := testCase.postingsStr
-			if actual != expected {
-				t.Errorf("failed to create index\n got : %v\nwant: %v\n", actual, expected)
+			got := string(bytes)
+			want := testCase.postingsStr
+			if got != want {
+				t.Errorf("got : %v\nwant: %v\n", got, want)
 			}
 		}()
 	}
