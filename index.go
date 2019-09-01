@@ -118,7 +118,7 @@ func (pl *PostingsList) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ドキュメントをポスティングリストに追加
+// ポスティングをリストに追加
 // ポスティングリストの最後を取得してドキュメントIDが
 // 一致していなければ、ポスティングを追加
 // 一致していれば、positionを追加
