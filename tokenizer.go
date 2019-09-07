@@ -13,8 +13,7 @@ func NewTokenizer() *Tokenizer {
 	return &Tokenizer{}
 }
 
-// TODO: 名前考える
-func converter(r rune) rune {
+func replace(r rune) rune {
 	// 英数字以外だったら捨てる
 	if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && !unicode.IsNumber(r) {
 		return -1
@@ -27,7 +26,10 @@ func converter(r rune) rune {
 func (t *Tokenizer) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	advance, token, err = bufio.ScanWords(data, atEOF)
 	if err == nil && token != nil {
-		token = bytes.Map(converter, token)
+		token = bytes.Map(replace, token)
+		if len(token) == 0 {
+			token = nil
+		}
 	}
 	return
 }

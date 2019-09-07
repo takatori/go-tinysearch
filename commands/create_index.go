@@ -1,13 +1,18 @@
 package commands
 
 import (
-	"database/sql"
-	"github.com/takatori/go-tinysearch"
 	"github.com/urfave/cli"
 	"log"
 	"os"
 	"path/filepath"
 )
+
+// インデックスを作成するコマンド
+var createIndexCommand = cli.Command{
+	Name:   "create",
+	Usage:  "create index",
+	Action: createIndex,
+}
 
 func createIndex(c *cli.Context) error {
 
@@ -16,17 +21,9 @@ func createIndex(c *cli.Context) error {
 	}
 	dir := c.Args().Get(0)
 
-	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3306)/tinysearch")
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
-	engine := tinysearch.NewSearchEngine(db)
-
 	var files []string
 	// 指定されたディレクトリ配下の.txtファイルのパスをすべて取得
-	err = filepath.Walk(dir,
+	err := filepath.Walk(dir,
 		func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() || filepath.Ext(path) != ".txt" {
 				return nil
