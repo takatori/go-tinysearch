@@ -10,6 +10,7 @@ import (
 var searchCommand = cli.Command{
 	Name:  "search",
 	Usage: "search documents",
+	ArgsUsage: `<query>`,
 	Flags: []cli.Flag{
 		cli.IntFlag{
 			Name:  "number, n",

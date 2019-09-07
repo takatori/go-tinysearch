@@ -11,7 +11,7 @@ import (
 var createIndexCommand = cli.Command{
 	Name:      "create",
 	Usage:     "create index",
-	ArgsUsage: "",
+	ArgsUsage: `<path>`,
 	Action:    createIndex,
 }
 
