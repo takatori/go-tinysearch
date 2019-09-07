@@ -40,10 +40,10 @@ func printResult(results []*tinysearch.SearchResult) {
 		fmt.Println("0 match!!")
 		return
 	}
-	resultStrs := make([]string, len(results))
+	s := make([]string, len(results))
 	for i, result := range results {
-		resultStrs[i] = fmt.Sprintf("rank: %3d, score: %4f, title: %s",
+		s[i] = fmt.Sprintf("rank: %3d, score: %4f, title: %s",
 			i+1, result.Score, result.Title)
 	}
-	fmt.Println(strings.Join(resultStrs, "\n"))
+	fmt.Println(strings.Join(s, "\n"))
 }

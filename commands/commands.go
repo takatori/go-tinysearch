@@ -10,12 +10,6 @@ import (
 	"os"
 )
 
-const (
-	exactArgs = iota
-	minArgs
-	maxArgs
-)
-
 var engine *tinysearch.Engine
 
 func Main() {
@@ -40,6 +34,12 @@ func Main() {
 		log.Fatal(err)
 	}
 }
+
+const (
+	exactArgs = iota
+	minArgs
+	maxArgs
+)
 
 func checkArgs(context *cli.Context, expected, checkType int) error {
 	var err error
