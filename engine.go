@@ -50,7 +50,7 @@ func (e *Engine) AddDocument(title string, reader io.Reader) error {
 // インデックスをファイルに書き出す
 func (e *Engine) Flush() error {
 	writer := NewIndexWriter(e.indexDir)
-	return writer.flush(e.indexer.index)
+	return writer.Flush(e.indexer.index)
 }
 
 // 検索を実行する

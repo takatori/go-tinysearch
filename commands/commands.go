@@ -6,6 +6,21 @@ import (
 	"os"
 )
 
+var Commands = []cli.Command{
+	{
+		Name:        "create",
+		Usage:       "create index",
+		Description: "",
+		Action:      createIndex,
+	},
+	{
+		Name:        "search",
+		Usage:       "search documents",
+		Description: "",
+		Action:      search,
+	},
+}
+
 const (
 	exactArgs = iota
 	minArgs
@@ -42,19 +57,4 @@ func checkArgs(context *cli.Context, expected, checkType int) error {
 		return err
 	}
 	return nil
-}
-
-var Commands = []cli.Command{
-	{
-		Name:        "create",
-		Usage:       "create index",
-		Description: "",
-		Action:      createIndex,
-	},
-	{
-		Name:        "search",
-		Usage:       "search documents",
-		Description: "",
-		Action:      search,
-	},
 }

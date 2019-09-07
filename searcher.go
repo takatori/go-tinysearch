@@ -69,23 +69,23 @@ func (s *Searcher) search(query []string) []*ScoreDoc {
 	}
 
 	// 一番短いポスティングリストを参照するカーソルを選択
-	c := s.cursors[0]
+	c0 := s.cursors[0]
 	cursors := s.cursors[1:]
 
 	// 結果を格納する構造体の初期化
 	docs := make([]*ScoreDoc, 0)
 
-	for !c.Empty() {
+	for !c0.Empty() {
 
 		var nextDocId DocumentID
 
 		for _, cursor := range cursors {
 			// docId以上になるまで読み進める
-			if cursor.NextDoc(c.DocId()); cursor.Empty() {
+			if cursor.NextDoc(c0.DocId()); cursor.Empty() {
 				return docs
 			}
 			// docIdが一致しなければ
-			if cursor.DocId() != c.DocId() {
+			if cursor.DocId() != c0.DocId() {
 				nextDocId = cursor.DocId()
 				break
 			}
@@ -93,16 +93,16 @@ func (s *Searcher) search(query []string) []*ScoreDoc {
 
 		if nextDocId > 0 {
 			// nextDocId以上になるまで読みすすめる
-			if c.NextDoc(nextDocId); c.Empty() {
+			if c0.NextDoc(nextDocId); c0.Empty() {
 				return docs
 			}
 		} else {
 			// 結果を格納
 			docs = append(docs, &ScoreDoc{
-				docID: c.DocId(),
+				docID: c0.DocId(),
 				score: s.calcScore(),
 			})
-			c.Next()
+			c0.Next()
 		}
 	}
 
